@@ -8,23 +8,22 @@
 
 <style>
   :root{
-    --brand:#e11d48;         /* red */
+    --brand:#e11d48;         /* Flip Radar red */
     --text:#0f172a;          /* slate-900 */
     --muted:#64748b;         /* slate-500 */
     --line:#e2e8f0;          /* slate-200 */
     --card:#ffffff;
     --chip:#f1f5f9;          /* slate-100 */
-    --btn:#111827;           /* almost black */
-    --map-style: light;
+    --btn:#111827;           /* near black */
+    --navy:#0c1220;          /* dark header/search */
   }
   .dark{
     --text:#e5e7eb;
     --muted:#94a3b8;
-    --line:#1f2937;
+    --line:#141d33;
     --card:#0b0f1a;
     --chip:#0f172a;
     --btn:#e5e7eb;
-    --map-style: dark;
     background:#0b0f1a;
     color:var(--text);
   }
@@ -39,41 +38,54 @@
     background:#fff; color:#000; border-bottom:1px solid var(--line);
     display:flex; align-items:center; justify-content:space-between; padding:0 14px;
   }
+  .dark .topbar{ background:var(--navy); color:#fff; border-bottom-color:#141d33; }
   .top-left{display:flex; align-items:center; gap:12px}
   .logo{display:flex; align-items:center; gap:8px}
   .logo svg{height:22px; width:22px}
   .logo .word{font-weight:800; letter-spacing:.2px; color:var(--brand)}
   .tabs{display:flex; gap:6px}
-  .tabs button{
+  .tab{
     color:#0f172a; background:#fff; border:1px solid var(--line);
     padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
     transition:.15s;
   }
-  .tabs button:hover{ background:var(--brand); color:#fff; border-color:var(--brand) }
-  .tabs button.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .tab:hover{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .dark .tab{ background:var(--navy); color:#cbd5e1; border-color:#1f2a44 }
+  .dark .tab:hover, .dark .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+
   .right-actions{display:flex; align-items:center; gap:8px}
   .switch{border:1px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; background:#fff}
+  .dark .switch{ background:var(--navy); color:#fff; border-color:#1f2a44 }
 
-  /* Combined search box */
+  /* Combined search */
   .search-wrap{ position:fixed; z-index:20; left:50%; transform:translateX(-50%); top:72px; width:min(1040px,95vw) }
   .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
          box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 25px rgba(0,0,0,.06); padding:10px }
+  .dark .card{ background:var(--navy); border-color:#1f2a44; box-shadow:none }
   .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
   .grow{ flex:1 1 320px }
   .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text);
           border-radius:10px; padding:10px 12px; font-size:14px; outline:0 }
+  .dark .input{ border-color:#1f2a44 }
   .sel{ border:1px solid var(--line); background:transparent; color:var(--text);
         border-radius:10px; padding:9px 10px }
+  .dark .sel{ border-color:#1f2a44 }
   .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
   .btn{ display:inline-flex; align-items:center; justify-content:center; padding:10px 14px;
-        border-radius:12px; border:1px solid var(--line); background:var(--btn); color:#fff;
-        cursor:pointer; white-space:nowrap }
+        border-radius:12px; border:1px solid var(--line); cursor:pointer; white-space:nowrap }
+  .btn-dark{ background:#111827; color:#fff }
+  .btn-ghost{ background:transparent; color:var(--text) }
+  .btn-red{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) } /* red in dark */
+
   .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
        overflow:auto; border-radius:12px; display:none }
   .ac button{ display:block; width:100%; text-align:left; padding:10px 12px; border:0;
               background:var(--card); color:var(--text); cursor:pointer; border-bottom:1px solid var(--line) }
   .ac button:last-child{ border-bottom:0 }
   .ac button:hover{ background:#f3f4f6 }
+  .dark .ac button:hover{ background:#0f172a }
 
   /* Layout */
   .app{ height:100%; display:grid; grid-template-columns:1fr 420px; padding-top:56px }
@@ -81,6 +93,7 @@
   #map{ width:100%; height:100% }
 
   .sidebar{ border-left:1px solid var(--line); background:var(--card); height:100vh; overflow:auto }
+  .dark .sidebar{ border-left-color:#1f2a44 }
   @media (max-width: 980px){ .sidebar{ height:auto } }
   .chips{ display:flex; gap:6px; align-items:center; padding:10px; border-bottom:1px solid var(--line) }
   .chip{ font-size:12px; background:var(--chip); border:1px solid var(--line); padding:4px 8px; border-radius:999px }
@@ -101,10 +114,10 @@
     width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
     font-size:18px;background:#fff;border:1px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,.2)
   }
-  .pin.blue{ border-color:#93c5fd; }
-  .pin.green{ border-color:#86efac; }
-  .pin.red{ border-color:#fecaca; }
 
+  /* Select-all toolbar */
+  .bulkbar{ position:sticky; top:0; z-index:5; background:var(--card); border-bottom:1px solid var(--line);
+            display:flex; align-items:center; justify-content:space-between; padding:10px 12px }
 </style>
 </head>
 <body>
@@ -113,7 +126,7 @@
   <div class="topbar">
     <div class="top-left">
       <a href="#" class="logo" aria-label="Flip Radar">
-        <!-- simple red radar SVG logo -->
+        <!-- red radar SVG -->
         <svg viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="9" stroke="#e11d48" stroke-width="2"/>
           <path d="M12 12 L19 7" stroke="#e11d48" stroke-width="2" stroke-linecap="round"/>
@@ -122,9 +135,9 @@
         <span class="word">Flip&nbsp;Radar</span>
       </a>
       <div class="tabs">
-        <button id="tab-buyers" class="active">Buyer Search</button>
-        <button id="tab-homefull">Homefull</button>
-        <button id="tab-sniping">Wholesaler Sniping</button>
+        <button id="tab-buyers" class="tab active">Buyer Search</button>
+        <button id="tab-homefull" class="tab">Homefull</button>
+        <button id="tab-sniping" class="tab">Wholesaler Sniping</button>
       </div>
     </div>
     <div class="right-actions">
@@ -132,7 +145,7 @@
     </div>
   </div>
 
-  <!-- SEARCH + FILTERS (ONE BOX) -->
+  <!-- SEARCH + FILTERS -->
   <div class="search-wrap">
     <div class="card" style="position:relative">
       <div class="row-flex">
@@ -152,7 +165,7 @@
             <option value="24">Last 24 mo</option>
           </select>
         </label>
-        <button id="searchBtn" class="btn">Search</button>
+        <button id="searchBtn" class="btn btn-dark">Search</button>
       </div>
       <div id="ac" class="card ac"></div>
     </div>
@@ -180,6 +193,17 @@
           <div class="muted" style="margin-top:6px;font-size:12px;">avg price</div>
           <div id="avgLand" style="font-weight:700;font-size:18px;">$—</div>
           <div class="muted" style="font-size:12px;">activity last <span id="tileMonthsB">12</span> mo</div>
+        </div>
+      </div>
+
+      <!-- bulk toolbar -->
+      <div class="bulkbar">
+        <label style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="selectAll"/>
+          <span class="muted">Select all</span>
+        </label>
+        <div style="display:flex;gap:8px">
+          <button id="bulkSkip" class="btn btn-red" disabled>Skip Trace Selected</button>
         </div>
       </div>
 
@@ -217,10 +241,13 @@
       { id:'e7', buyer_id:'b4', property_id:'p6', event_type:'purchase', event_date:'2025-08-05', price:330000, source:'mls' },
     ];
 
-    /* ===================== HELPERS ===================== */
+    /* ===================== STATE ===================== */
     const INITIAL={lat:29.4241, lon:-98.4936};
     let mode='buyers', center={...INITIAL}, miles=2, months=12;
 
+    const selected = new Set(); // for bulk selection
+
+    /* ===================== HELPERS ===================== */
     function monthsAgo(n){ const d=new Date(); d.setMonth(d.getMonth()-n); return d; }
     function distanceMiles(a,b){
       const R=3958.8,toRad=x=>x*Math.PI/180;
@@ -240,6 +267,8 @@
       }
       return { type:'Feature', geometry:{type:'Polygon',coordinates:[coords]}, properties:{} };
     }
+
+    // Compute results strictly within radius; also expose latest inside-radius coord for pin
     function computeResults(cen,mi,mo){
       const since=monthsAgo(mo);
       const filtered=events.filter(e=>{
@@ -247,22 +276,34 @@
         return e.event_type==='purchase' && new Date(e.event_date)>=since &&
                distanceMiles(cen,{lat:p.lat,lon:p.lon})<=mi;
       });
+
       const by={};
       filtered.forEach(ev=>{
         const b=buyers.find(bb=>bb.id===ev.buyer_id); if(!b) return;
-        by[b.id] = by[b.id] || { buyer:b, deals:[], last:new Date(0) };
+        by[b.id] = by[b.id] || { buyer:b, deals:[], last:new Date(0), lastCoord:null };
         by[b.id].deals.push(ev);
-        const d=new Date(ev.event_date); if(d>by[b.id].last) by[b.id].last=d;
+        const d=new Date(ev.event_date);
+        if(d>by[b.id].last){
+          by[b.id].last=d;
+          const p=properties.find(pp=>pp.id===ev.property_id);
+          by[b.id].lastCoord = p ? [p.lon,p.lat] : null; // latest INSIDE-RADIUS coord
+        }
       });
+
       const out = Object.values(by).map(v=>{
         const prices=v.deals.map(d=>d.price).sort((a,b)=>a-b);
         const mid=Math.floor(prices.length/2);
         const median=prices.length%2?prices[mid]:(prices[mid-1]+prices[mid])/2;
-        return { id:v.buyer.id, name:v.buyer.name, buyer_type:v.buyer.buyer_type, contacts:v.buyer.contacts, deals:v.deals.length, last:v.last, median };
+        return {
+          id:v.buyer.id, name:v.buyer.name, buyer_type:v.buyer.buyer_type, contacts:v.buyer.contacts,
+          deals:v.deals.length, last:v.last, median, coord:v.lastCoord
+        };
       });
+
       out.sort((a,b)=> b.deals-a.deals || b.last-b.last);
       return out;
     }
+
     function smartMatch(r){
       const days=Math.max(1,(Date.now()-r.last.getTime())/(1000*60*60*24));
       const rec=Math.max(0,100-Math.min(100,days/3));
@@ -270,10 +311,9 @@
       return Math.round(0.6*rec+0.4*freq);
     }
 
-    /* ===================== MAP (DOM MARKERS + EMOJIS) ===================== */
+    /* ===================== MAP ===================== */
     mapboxgl.accessToken = MAPBOX_TOKEN;
-
-    const mapStyleLight = 'mapbox://styles/mapbox/navigation-day-v1';
+    const mapStyleLight = 'mapbox://styles/mapbox/light-v11';   // plainer style
     const mapStyleDark  = 'mapbox://styles/mapbox/dark-v11';
 
     let map = new mapboxgl.Map({
@@ -284,7 +324,6 @@
     });
     map.addControl(new mapboxgl.NavigationControl());
 
-    // sources for radius (DOM markers don't need a source)
     function addRadiusSources(){
       if(map.getSource('radius')) return;
       map.addSource('radius',{ type:'geojson', data:circlePolygon(center.lon,center.lat,miles) });
@@ -292,8 +331,8 @@
       map.addLayer({ id:'radius-line', type:'line', source:'radius', paint:{ 'line-color':'#ef4444','line-width':2 }});
     }
     map.on('load',()=>{ addRadiusSources(); refreshAll(true); });
+    map.on('click', e=>{ center={lat:e.lngLat.lat, lon:e.lngLat.lng}; refreshAll(true); });
 
-    // switch styles when dark mode toggles
     function switchStyle(){
       const style = document.body.classList.contains('dark') ? mapStyleDark : mapStyleLight;
       map.setStyle(style);
@@ -301,46 +340,30 @@
     }
 
     // DOM markers
-    const markerById = new Map();     // id -> { marker, popup, coords }
+    const markerById = new Map();
     function clearMarkers(){
       for(const {marker,popup} of markerById.values()){ popup.remove(); marker.remove(); }
       markerById.clear();
     }
-    function emojiFor(type){
-      if(type==='flipper') return '🛠️';
-      if(type==='landlord') return '🏠';
-      return '💵';
-    }
-    function colorFor(type){
-      if(type==='flipper') return 'blue';
-      if(type==='landlord') return 'green';
-      return 'red';
-    }
+    const emojiFor = t => t==='flipper'?'🛠️':(t==='landlord'?'🏠':'💵');
 
     function buildMarkers(results){
       clearMarkers();
       results.forEach(r=>{
-        const last = events.filter(e=>e.buyer_id===r.id).sort((a,b)=>+new Date(b.event_date)-+new Date(a.event_date))[0];
-        const p = properties.find(pp=>pp.id===last?.property_id) || {lon:center.lon,lat:center.lat};
+        const coords = r.coord || [center.lon,center.lat];
         const el = document.createElement('div');
-        el.className = `pin ${colorFor(r.buyer_type)}`;
+        el.className = 'pin';
         el.textContent = emojiFor(r.buyer_type);
         const popup = new mapboxgl.Popup({ closeButton:false, offset: 12 })
-          .setHTML(`<div style="font-weight:700">${r.name}</div><div style="font-size:12px;color:#555">${r.buyer_type}</div>`);
-
-        const marker = new mapboxgl.Marker({ element: el }).setLngLat([p.lon,p.lat]).setPopup(popup).addTo(map);
-
+          .setHTML(`<div style="font-weight:700">${r.name}</div><div style="font-size:12px;opacity:.8">${r.buyer_type}</div>`);
+        const marker = new mapboxgl.Marker({ element: el }).setLngLat(coords).setPopup(popup).addTo(map);
         el.addEventListener('mouseenter', ()=> marker.togglePopup());
         el.addEventListener('mouseleave', ()=> marker.togglePopup());
-
-        markerById.set(r.id, { marker, popup, coords:[p.lon,p.lat] });
+        markerById.set(r.id, { marker, popup, coords });
       });
     }
 
-    // click to recenter
-    map.on('click', e=>{ center={lat:e.lngLat.lat, lon:e.lngLat.lng}; refreshAll(true); });
-
-    /* ===================== UI ===================== */
+    /* ===================== UI WIRING ===================== */
     const tBuy=document.getElementById('tab-buyers');
     const tHome=document.getElementById('tab-homefull');
     const tSni=document.getElementById('tab-sniping');
@@ -356,22 +379,21 @@
     tHome.onclick=()=>{mode='homefull'; setActive(); refreshAll(false);}
     tSni.onclick=()=>{mode='sniping'; setActive(); refreshAll(false);}
 
-    // dark mode toggle
     document.getElementById('darkToggle').onclick = ()=>{
       document.body.classList.toggle('dark');
+      // make Search + +Add buttons red while in dark mode
+      document.getElementById('searchBtn').className = document.body.classList.contains('dark') ? 'btn btn-red' : 'btn btn-dark';
       switchStyle();
     };
 
-    // filter chips
     document.getElementById('miles').onchange = e=>{ miles=parseFloat(e.target.value); refreshAll(true); };
     document.getElementById('months').onchange = e=>{ months=parseInt(e.target.value,10); refreshAll(false); };
 
-    // search + autocomplete (Mapbox geocoding)
+    // search & autocomplete
     const ac=document.getElementById('ac');
     const search=document.getElementById('search');
     document.getElementById('searchBtn').onclick = ()=> doSearch(search.value);
     search.addEventListener('keydown',e=>{ if(e.key==='Enter') doSearch(search.value); });
-
     let acTimer=null;
     search.addEventListener('input', ()=>{
       const q=search.value.trim();
@@ -402,6 +424,31 @@
     }
 
     /* ===================== RENDER ===================== */
+    const resultsDiv = document.getElementById('results');
+    const selectAllEl = document.getElementById('selectAll');
+    const bulkBtn = document.getElementById('bulkSkip');
+
+    function updateBulkUI(){
+      bulkBtn.disabled = selected.size===0;
+      selectAllEl.indeterminate = selected.size>0 && selected.size < (resultsDiv.querySelectorAll('.row').length||0);
+      selectAllEl.checked = selected.size>0 && selected.size === (resultsDiv.querySelectorAll('.row').length||0);
+    }
+
+    selectAllEl.addEventListener('change', ()=>{
+      const check = selectAllEl.checked;
+      selected.clear();
+      resultsDiv.querySelectorAll('input[type="checkbox"][data-id]').forEach(cb=>{
+        cb.checked = check;
+        if(check) selected.add(cb.dataset.id);
+      });
+      updateBulkUI();
+    });
+
+    bulkBtn.addEventListener('click', ()=>{
+      // Here you’d kick off your BatchData bulk skiptrace.
+      alert(`Bulk skiptrace for ${selected.size} selected buyers:\n\n` + [...selected].join('\n'));
+    });
+
     function refreshAll(fly){
       // chips
       document.getElementById('chipMiles').textContent=`${miles} mi`;
@@ -419,23 +466,33 @@
       document.getElementById('avgLand').textContent=`$${avg(lands).toLocaleString()}`;
 
       // sidebar list
-      const list=document.getElementById('results'); list.innerHTML='';
+      selected.clear();
+      resultsDiv.innerHTML='';
       if(mode==='buyers'){
         if(!res.length){
-          list.innerHTML=`<div class="row muted">No active buyers found. Try increasing the radius or time window.</div>`;
+          resultsDiv.innerHTML=`<div class="row muted">No active buyers found within ${miles} mi. Try widening the radius or time window.</div>`;
         }else{
           res.forEach(r=>{
             const color = r.buyer_type==='flipper'?'blue':(r.buyer_type==='landlord'?'green':'red');
             const row=document.createElement('div'); row.className='row'; row.dataset.id=r.id;
             row.innerHTML=`
-              <div class="top"><div>${r.name}</div><span class="badge ${color}">${r.buyer_type}</span></div>
+              <div class="top" style="gap:10px">
+                <label style="display:flex;align-items:center;gap:8px">
+                  <input type="checkbox" data-id="${r.id}"/>
+                  <div>${r.name}</div>
+                </label>
+                <span class="badge ${color}">${r.buyer_type}</span>
+              </div>
               <div>
                 <span class="badge" style="background:#fde68a;border-color:#fde68a;color:#92400e;">⚡ SmartMatch ${smartMatch(r)}</span>
                 <span class="badge" style="margin-left:6px;background:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};border-color:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
                 <span class="muted"> Last: ${r.last.toLocaleDateString()}</span>
               </div>
               <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
-              <div class="actions"><button class="btn" style="background:transparent;color:var(--text)">Send to Zapier</button><button class="btn">+ Add to Buyers List</button></div>`;
+              <div class="actions">
+                <button class="btn btn-ghost">Skip Trace</button>
+                <button class="btn ${document.body.classList.contains('dark')?'btn-red':'btn-dark'}">+ Add to Buyers List</button>
+              </div>`;
             // hover a card -> show popup + center map
             row.addEventListener('mouseenter', ()=>{
               const m = markerById.get(r.id); if(!m) return;
@@ -444,27 +501,36 @@
             row.addEventListener('mouseleave', ()=>{
               const m = markerById.get(r.id); if(!m) return; m.marker.togglePopup();
             });
-            list.appendChild(row);
+            // checkbox
+            row.querySelector('input[type="checkbox"]').addEventListener('change', (e)=>{
+              const id = e.target.dataset.id;
+              if(e.target.checked) selected.add(id); else selected.delete(id);
+              updateBulkUI();
+            });
+
+            resultsDiv.appendChild(row);
           });
         }
       }else if(mode==='homefull'){
-        list.innerHTML=`
+        resultsDiv.innerHTML=`
           <div class="row"><b>Homefull</b><div class="muted">AI-OCR on active & sold listings; agent leaderboard.</div></div>
           <div class="row">
             <div class="top"><div>506 Washington Blvd</div><span class="badge">Flip-Like 0.81</span></div>
             <div class="muted">Staged • LVP • Subway tile • Matte black</div>
             <div class="muted" style="margin-top:6px;">Agent: Leslie Elrod (432) 517-0038</div>
-            <div class="actions"><button class="btn" style="background:transparent;color:var(--text)">Call Agent</button><button class="btn">Skiptrace Owner</button></div>
+            <div class="actions"><button class="btn btn-ghost">Call Agent</button><button class="btn ${document.body.classList.contains('dark')?'btn-red':'btn-dark'}">Skiptrace Owner</button></div>
           </div>`;
       }else{
-        list.innerHTML=`
+        resultsDiv.innerHTML=`
           <div class="row"><b>Wholesaler Sniping</b><div class="muted">Grantor → Grantee repeat pairs (last ${months} mo).</div></div>
           <div class="row">
             <div class="top"><div>ABC Investments LLC → Evergreen Homes LLC</div><span class="badge">6 in 12 mo</span></div>
             <div class="muted">last_deal: 2025-06-11</div>
-            <div class="actions"><button class="btn" style="background:transparent;color:var(--text)">Skiptrace Buyer</button><button class="btn">+ Add to Buyers List</button></div>
+            <div class="actions"><button class="btn btn-ghost">Skiptrace Buyer</button><button class="btn ${document.body.classList.contains('dark')?'btn-red':'btn-dark'}">+ Add to Buyers List</button></div>
           </div>`;
       }
+
+      updateBulkUI();
 
       // markers + radius
       buildMarkers(res);
@@ -472,7 +538,7 @@
       if(fly) map.flyTo({center:[center.lon,center.lat], zoom:Math.max(map.getZoom(),11), essential:true});
     }
 
-    /* initial */
+    // tab + initial
     setActive();
   </script>
 </body>
