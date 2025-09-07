@@ -218,10 +218,10 @@
 
     /* ===================== DEMO DATA ===================== */
     const buyers = [
-      { id:'b1', name:'Evergreen Residential LLC', buyer_type:'flipper', contacts:[{phone:'210-555-0187'}]},
-      { id:'b2', name:'Alamo Rentals Group',      buyer_type:'landlord', contacts:[{phone:'210-555-0142'}]},
-      { id:'b3', name:'River City Capital',       buyer_type:'cash',     contacts:[{phone:'210-555-0199'}]},
-      { id:'b4', name:'Hill Country Flips',       buyer_type:'flipper',  contacts:[{email:'offers@hillcountryflips.com'}]},
+      { id:'b1', name:'Evergreen Residential LLC', buyer_type:'Flipper', contacts:[{phone:'210-555-0187'}]},
+      { id:'b2', name:'Alamo Rentals Group',      buyer_type:'Landlord', contacts:[{phone:'210-555-0142'}]},
+      { id:'b3', name:'River City Capital',       buyer_type:'Cash',     contacts:[{phone:'210-555-0199'}]},
+      { id:'b4', name:'Hill Country Flips',       buyer_type:'Flipper',  contacts:[{email:'offers@hillcountryflips.com'}]},
     ];
     const properties = [
       { id:'p1', addr1:'112 Blanco Rd', city:'San Antonio', state:'TX', zip:'78212', lat:29.462, lon:-98.501 },
@@ -339,29 +339,62 @@
       map.once('style.load',()=>{ addRadiusSources(); refreshAll(false); });
     }
 
-    // DOM markers
-    const markerById = new Map();
-    function clearMarkers(){
-      for(const {marker,popup} of markerById.values()){ popup.remove(); marker.remove(); }
-      markerById.clear();
-    }
-    const emojiFor = t => t==='flipper'?'🛠️':(t==='landlord'?'🏠':'💵');
+ // DOM markers
+const markerById = new Map<string, { marker: mapboxgl.Marker; popup: mapboxgl.Popup; coords: [number, number] }>();
 
-    function buildMarkers(results){
-      clearMarkers();
-      results.forEach(r=>{
-        const coords = r.coord || [center.lon,center.lat];
-        const el = document.createElement('div');
-        el.className = 'pin';
-        el.textContent = emojiFor(r.buyer_type);
-        const popup = new mapboxgl.Popup({ closeButton:false, offset: 12 })
-          .setHTML(`<div style="font-weight:700">${r.name}</div><div style="font-size:12px;opacity:.8">${r.buyer_type}</div>`);
-        const marker = new mapboxgl.Marker({ element: el }).setLngLat(coords).setPopup(popup).addTo(map);
-        el.addEventListener('mouseenter', ()=> marker.togglePopup());
-        el.addEventListener('mouseleave', ()=> marker.togglePopup());
-        markerById.set(r.id, { marker, popup, coords });
-      });
-    }
+function clearMarkers() {
+  for (const { marker, popup } of markerById.values()) {
+    popup.remove();
+    marker.remove();
+  }
+  markerById.clear();
+}
+
+const emojiFor = (t: string) => (t === 'Flipper' ? '🛠️' : t === 'Landlord' ? '🏠' : '💵');
+const colorFor = (t: string) => (t === 'Flipper' ? '#3b82f6' : t === 'Landlord' ? '#22c55e' : '#ef4444'); // blue/green/red
+const labelFor = (t: string) => (t === 'Flipper' ? 'Flipper' : t === 'Landlord' ? 'Landlord' : 'Cash');
+
+function buildMarkers(results: Array<{ id: string; name: string; buyer_type: string; coord?: [number, number] }>) {
+  clearMarkers();
+
+  results.forEach((r) => {
+    const coords: [number, number] = r.coord || [center.lon, center.lat];
+
+    // marker element with colored circular background
+    const el = document.createElement('div');
+    el.className = 'pin';
+    el.innerHTML = emojiFor(r.buyer_type);
+    el.style.width = '28px';
+    el.style.height = '28px';
+    el.style.borderRadius = '50%';
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'center';
+    el.style.fontSize = '18px';
+    el.style.lineHeight = '1';
+    el.style.userSelect = 'none';
+    el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.25)';
+    el.style.border = '1px solid rgba(255,255,255,0.8)';
+    el.style.backgroundColor = colorFor(r.buyer_type);
+    el.style.color = '#fff';
+
+    const popup = new mapboxgl.Popup({ closeButton: false, offset: 12 }).setHTML(
+      `<div style="font-weight:700">${r.name}</div>
+       <div style="font-size:12px;opacity:.8">${labelFor(r.buyer_type)}</div>`
+    );
+
+    const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+      .setLngLat(coords)
+      .setPopup(popup)
+      .addTo(map);
+
+    el.addEventListener('mouseenter', () => marker.togglePopup());
+    el.addEventListener('mouseleave', () => marker.togglePopup());
+
+    markerById.set(r.id, { marker, popup, coords });
+  });
+}
+
 
     /* ===================== UI WIRING ===================== */
     const tBuy=document.getElementById('tab-buyers');
@@ -460,8 +493,8 @@
 
       // metrics
       const avg=a=>Math.round((a.reduce((x,y)=>x+y,0))/(a.length||1));
-      const flips=res.filter(r=>r.buyer_type==='flipper').map(r=>r.median);
-      const lands=res.filter(r=>r.buyer_type==='landlord').map(r=>r.median);
+      const flips=res.filter(r=>r.buyer_type==='Flipper').map(r=>r.median);
+      const lands=res.filter(r=>r.buyer_type==='Landlord').map(r=>r.median);
       document.getElementById('avgFlip').textContent=`$${avg(flips).toLocaleString()}`;
       document.getElementById('avgLand').textContent=`$${avg(lands).toLocaleString()}`;
 
@@ -473,7 +506,7 @@
           resultsDiv.innerHTML=`<div class="row muted">No active buyers found within ${miles} mi. Try widening the radius or time window.</div>`;
         }else{
           res.forEach(r=>{
-            const color = r.buyer_type==='flipper'?'blue':(r.buyer_type==='landlord'?'green':'red');
+            const color = r.buyer_type==='Flipper'?'blue':(r.buyer_type==='Landlord'?'green':'red');
             const row=document.createElement('div'); row.className='row'; row.dataset.id=r.id;
             row.innerHTML=`
               <div class="top" style="gap:10px">
@@ -485,7 +518,7 @@
               </div>
               <div>
                 <span class="badge" style="background:#fde68a;border-color:#fde68a;color:#92400e;">⚡ SmartMatch ${smartMatch(r)}</span>
-                <span class="badge" style="margin-left:6px;background:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};border-color:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
+                <span class="badge" style="margin-left:6px;background:${r.buyer_type==='Flipper'?'#3b82f6':'#22c55e'};border-color:${r.buyer_type==='Flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
                 <span class="muted"> Last: ${r.last.toLocaleDateString()}</span>
               </div>
               <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
