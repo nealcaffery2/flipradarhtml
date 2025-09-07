@@ -339,8 +339,8 @@
       map.once('style.load',()=>{ addRadiusSources(); refreshAll(false); });
     }
 
- // DOM markers
-const markerById = new Map<string, { marker: mapboxgl.Marker; popup: mapboxgl.Popup; coords: [number, number] }>();
+// DOM markers (PLAIN JS)
+const markerById = new Map();
 
 function clearMarkers() {
   for (const { marker, popup } of markerById.values()) {
@@ -350,15 +350,21 @@ function clearMarkers() {
   markerById.clear();
 }
 
-const emojiFor = (t: string) => (t === 'Flipper' ? '🛠️' : t === 'Landlord' ? '🏠' : '💵');
-const colorFor = (t: string) => (t === 'Flipper' ? '#3b82f6' : t === 'Landlord' ? '#22c55e' : '#ef4444'); // blue/green/red
-const labelFor = (t: string) => (t === 'Flipper' ? 'Flipper' : t === 'Landlord' ? 'Landlord' : 'Cash');
+function emojiFor(t) {
+  return t === 'Flipper' ? '🛠️' : t === 'Landlord' ? '🏠' : '💵';
+}
+function colorFor(t) {
+  return t === 'Flipper' ? '#3b82f6' : t === 'Landlord' ? '#22c55e' : '#ef4444';
+}
+function labelFor(t) {
+  return t === 'Flipper' ? 'Flipper' : t === 'Landlord' ? 'Landlord' : 'Cash';
+}
 
-function buildMarkers(results: Array<{ id: string; name: string; buyer_type: string; coord?: [number, number] }>) {
+function buildMarkers(results) {
   clearMarkers();
 
   results.forEach((r) => {
-    const coords: [number, number] = r.coord || [center.lon, center.lat];
+    const coords = r.coord || [center.lon, center.lat];
 
     // marker element with colored circular background
     const el = document.createElement('div');
@@ -388,13 +394,13 @@ function buildMarkers(results: Array<{ id: string; name: string; buyer_type: str
       .setPopup(popup)
       .addTo(map);
 
+    // show popup on hover
     el.addEventListener('mouseenter', () => marker.togglePopup());
     el.addEventListener('mouseleave', () => marker.togglePopup());
 
     markerById.set(r.id, { marker, popup, coords });
   });
 }
-
 
     /* ===================== UI WIRING ===================== */
     const tBuy=document.getElementById('tab-buyers');
