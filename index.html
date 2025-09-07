@@ -322,7 +322,7 @@
           name:v.buyer.name,
           buyer_type:v.buyer.buyer_type,
           contacts:v.buyer.contacts,
-          deals:v.deals.length,           // true count in timeframe
+          deals:v.deals.length,           // Deals Bought in timeframe
           last:v.last,
           median,
           coord:v.lastCoord,
@@ -345,7 +345,7 @@
       // Distance factor: closer = higher. If radius=mi and dist in [0, mi], map to [100..0]
       const prox = Math.max(0, Math.min(100, Math.round((1 - (r.dist / Math.max(0.1, miles))) * 100)));
 
-      // True count factor (deals in current window): 0→100 scaled
+      // Deals Bought factor (deals in current window): 0→100 scaled
       const activity = Math.max(0, Math.min(100, r.deals * 20)); // 5+ deals caps
 
       // Portfolio factor (last 24 months across all areas)
@@ -537,7 +537,7 @@
 
         <div class="muted" style="display:flex;gap:8px;flex-wrap:wrap">
           <span class="badge" style="background:#eef2ff;border-color:#eef2ff;color:#3730a3">Dist ~ ${r.dist.toFixed(2)} mi</span>
-          <span class="badge" style="background:#fef3c7;border-color:#fef3c7;color:#92400e">True count: ${r.deals}</span>
+          <span class="badge" style="background:#fef3c7;border-color:#fef3c7;color:#92400e">Deals Bought: ${r.deals}</span>
           <span class="badge" style="background:#d1fae5;border-color:#d1fae5;color:#065f46">Portfolio 24m: ${r.portfolio24}</span>
           <span class="badge" style="background:#fee2e2;border-color:#fee2e2;color:#7f1d1d">Last: ${r.last.toLocaleDateString()}</span>
         </div>
