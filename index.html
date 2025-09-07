@@ -8,74 +8,97 @@
 
 <style>
   :root{
-    --brand:#b91c1c; --brand-600:#dc2626;
-    --text:#0f172a; --muted:#64748b; --line:#e2e8f0;
-    --card:#ffffff; --chip:#f1f5f9; --btn:#111827; --navy:#0c1220;
-    --meter-bg:#e5e7eb; --meter-bg-dark:#1f2a44;
+    --brand:#b91c1c;         /* darker red */
+    --brand-600:#dc2626;     /* hover red */
+    --text:#0f172a;          /* slate-900 */
+    --muted:#64748b;         /* slate-500 */
+    --line:#e2e8f0;          /* slate-200 */
+    --card:#ffffff;
+    --chip:#f1f5f9;          /* slate-100 */
+    --btn:#111827;           /* near black */
+    --navy:#0c1220;          /* dark header/search */
+    --good:#22c55e;          /* green */
+    --blue:#3b82f6;          /* blue */
+    --warn:#f59e0b;          /* amber */
   }
   .dark{
-    --text:#e5e7eb; --muted:#94a3b8; --line:#141d33;
-    --card:#0b0f1a; --chip:#0f172a; --btn:#e5e7eb;
-    background:#0b0f1a; color:var(--text);
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --line:#141d33;
+    --card:#0b0f1a;
+    --chip:#0f172a;
+    --btn:#e5e7eb;
+    background:#0b0f1a;
+    color:var(--text);
   }
-
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;color:var(--text);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
   a{color:inherit;text-decoration:none}
 
   /* Top bar */
-  .topbar{position:fixed; inset:0 0 auto 0; height:56px; z-index:30; background:#fff; color:#000; border-bottom:1px solid var(--line);
-    display:flex; align-items:center; justify-content:space-between; padding:0 14px;}
-  .dark .topbar{ background:var(--navy); color:#fff; border-bottom-color:#141d33;}
+  .topbar{
+    position:fixed; inset:0 0 auto 0; height:56px; z-index:30;
+    background:#fff; color:#000; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; padding:0 14px;
+  }
+  .dark .topbar{ background:var(--navy); color:#fff; border-bottom-color:#141d33; }
   .top-left{display:flex; align-items:center; gap:12px}
   .logo{display:flex; align-items:center; gap:8px}
   .logo svg{height:22px; width:22px}
   .logo .word{font-weight:800; letter-spacing:.2px; color:var(--brand)}
   .tabs{display:flex; gap:6px}
-  .tab{color:#0f172a; background:#fff; border:1px solid var(--line); padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600; transition:.15s;}
-  .tab:hover{ background:var(--brand); color:#fff; border-color:var(--brand)}
-  .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand)}
+  .tab{
+    color:#0f172a; background:#fff; border:1px solid var(--line);
+    padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+    transition:.15s;
+  }
+  .tab:hover{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
   .dark .tab{ background:var(--navy); color:#cbd5e1; border-color:#1f2a44 }
   .dark .tab:hover, .dark .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
-  .right-actions{display:flex; align-items:center; gap:10px}
-  .switch,.profile{border:1px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; background:#fff; display:flex; align-items:center; gap:8px}
-  .profile-initials{width:24px;height:24px;border-radius:999px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
-  .dark .switch,.dark .profile{ background:var(--navy); color:#fff; border-color:#1f2a44 }
 
-  /* profile dropdown */
-  .menu{position:absolute; right:14px; top:52px; background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:0 8px 25px rgba(0,0,0,.1); display:none;}
-  .menu button{display:block; padding:10px 14px; background:transparent; border:0; width:180px; text-align:left; cursor:pointer}
-  .menu button:hover{background:#f3f4f6}
-  .dark .menu{border-color:#1f2a44; background:#0c1220}
+  .right-actions{display:flex; align-items:center; gap:8px; position:relative}
+  .switch{border:1px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; background:#fff}
+  .dark .switch{ background:var(--navy); color:#fff; border-color:#1f2a44 }
+  .profile{border:1px solid var(--line); border-radius:999px; padding:8px 10px; cursor:pointer; background:#fff}
+  .dark .profile{ background:var(--navy); color:#fff; border-color:#1f2a44 }
+  .menu{position:absolute; top:44px; right:0; background:var(--card); border:1px solid var(--line); border-radius:12px; min-width:220px; display:none; z-index:50}
+  .menu button{display:block; width:100%; text-align:left; padding:10px 12px; border:0; background:transparent; color:var(--text); cursor:pointer}
+  .menu button:hover{background:rgba(0,0,0,.04)}
   .dark .menu button:hover{background:#0f172a}
 
   /* Combined search */
-  .search-wrap{ position:fixed; z-index:20; left:50%; transform:translateX(-50%); top:72px; width:min(1100px,95vw) }
+  .search-wrap{ position:fixed; z-index:20; left:50%; transform:translateX(-50%); top:72px; width:min(1040px,95vw) }
   .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
          box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 25px rgba(0,0,0,.06); padding:10px }
   .dark .card{ background:var(--navy); border-color:#1f2a44; box-shadow:none }
   .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
-  .grow{ flex:2 1 420px; min-width:260px }
+  .grow{ flex:1 1 360px }
   .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text);
-          border-radius:10px; padding:12px 12px; font-size:14px; outline:0 }
+          border-radius:10px; padding:10px 12px; font-size:14px; outline:0 }
   .dark .input{ border-color:#1f2a44 }
   .sel{ border:1px solid var(--line); background:transparent; color:var(--text);
-        border-radius:10px; padding:11px 10px }
+        border-radius:10px; padding:9px 10px }
   .dark .sel{ border-color:#1f2a44 }
   .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
-  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:11px 16px;
-        border-radius:12px; border:1px solid var(--line); cursor:pointer; white-space:nowrap; font-weight:600 }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:10px 14px;
+        border-radius:12px; border:1px solid var(--line); cursor:pointer; white-space:nowrap }
+  .btn-dark{ background:var(--brand); color:#fff; border-color:var(--brand) }  /* red in light */
+  .btn-ghost{ background:transparent; color:var(--text) }
   .btn-red{ background:var(--brand); color:#fff; border-color:var(--brand) }
   .btn-red:hover{ background:var(--brand-600); border-color:var(--brand-600) }
+  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) }
 
-  .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px; overflow:auto; border-radius:12px; display:none }
-  .ac button{ display:block; width:100%; text-align:left; padding:10px 12px; border:0; background:var(--card); color:var(--text); cursor:pointer; border-bottom:1px solid var(--line) }
+  .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
+       overflow:auto; border-radius:12px; display:none }
+  .ac button{ display:block; width:100%; text-align:left; padding:10px 12px; border:0;
+              background:var(--card); color:var(--text); cursor:pointer; border-bottom:1px solid var(--line) }
   .ac button:last-child{ border-bottom:0 }
   .ac button:hover{ background:#f3f4f6 }
   .dark .ac button:hover{ background:#0f172a }
 
   /* Layout */
-  .app{ height:100%; display:grid; grid-template-columns:1fr 440px; padding-top:56px }
+  .app{ height:100%; display:grid; grid-template-columns:1fr 420px; padding-top:56px }
   @media (max-width: 980px){ .app{ grid-template-columns:1fr } }
   #map{ width:100%; height:100% }
 
@@ -84,10 +107,6 @@
   @media (max-width: 980px){ .sidebar{ height:auto } }
   .chips{ display:flex; gap:6px; align-items:center; padding:10px; border-bottom:1px solid var(--line) }
   .chip{ font-size:12px; background:var(--chip); border:1px solid var(--line); padding:4px 8px; border-radius:999px }
-
-  .controls{ display:flex; gap:8px; align-items:center; padding:10px; border-bottom:1px solid var(--line) }
-  .controls .sel{ padding:8px 10px }
-
   .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:10px; border-bottom:1px solid var(--line) }
   @media (max-width: 420px){ .tile-grid{ grid-template-columns:1fr } }
   .tile{ padding:10px }
@@ -99,29 +118,30 @@
   .badge.green{ background:#22c55e; color:#fff; border-color:#22c55e }
   .badge.red{ background:#ef4444; color:#fff; border-color:#ef4444 }
   .actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px }
-  .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--line) }
 
-  /* Emoji marker */
-  .pin{ width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:18px;line-height:1;user-select:none;border:1px solid rgba(255,255,255,0.85);
-    box-shadow:0 2px 6px rgba(0,0,0,.25); color:#fff; }
+  /* Emoji marker styling (colored background now controlled per-type) */
+  .pin{
+    width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:18px;line-height:1;user-select:none;box-shadow:0 2px 6px rgba(0,0,0,.25);
+    border:1px solid rgba(255,255,255,0.8); color:#fff;
+  }
 
-  /* Buyer Score meter */
-  .score { display:flex; align-items:center; gap:8px; margin:8px 0 4px 0; }
-  .score .thermo { font-size:16px; line-height:1; }
-  .score .meter { flex:1; height:8px; background:var(--meter-bg); border-radius:999px; overflow:hidden; }
-  .dark .score .meter { background:var(--meter-bg-dark); }
-  .score .fill { height:100%; width:0%; background:#3b82f6; transition:width .25s ease; border-radius:999px; }
+  /* Buyers List (sheet style) */
+  .tools{ display:flex; gap:8px; padding:10px; border-bottom:1px solid var(--line); align-items:center; justify-content:space-between }
+  .filters{ display:flex; gap:8px; align-items:center }
+  .table{ width:100%; border-collapse:separate; border-spacing:0 }
+  .table th, .table td{ padding:8px 10px; border-bottom:1px solid var(--line); text-align:left }
+  .table th{ background:var(--chip); position:sticky; top:0; z-index:1 }
+  .star{ cursor:pointer; font-size:16px }
+  .star.vip{ color:var(--brand) }
+  .small{ font-size:12px; color:var(--muted) }
 
-  /* Select-all toolbar */
-  .bulkbar{ position:sticky; top:0; z-index:5; background:var(--card); border-bottom:1px solid var(--line);
-            display:flex; align-items:center; justify-content:space-between; padding:10px 12px }
+  /* Temperature bar */
+  .therm-wrap{display:inline-flex; align-items:center; gap:6px}
+  .therm-bar{width:90px; height:8px; border-radius:999px; background:#e5e7eb; overflow:hidden; border:1px solid #e5e7eb}
+  .dark .therm-bar{ background:#0f172a; border-color:#1f2a44 }
+  .therm-fill{height:100%; width:0%}
 
-  /* Login modal */
-  .modal{position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; z-index:50}
-  .modal .panel{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; width:360px}
-  .modal .row{border:0}
-  .modal .input{padding:10px}
 </style>
 </head>
 <body>
@@ -130,6 +150,7 @@
   <div class="topbar">
     <div class="top-left">
       <a href="#" class="logo" aria-label="Flip Radar">
+        <!-- red radar SVG -->
         <svg viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="9" stroke="#b91c1c" stroke-width="2"/>
           <path d="M12 12 L19 7" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
@@ -141,44 +162,22 @@
         <button id="tab-buyers" class="tab active">Buyer Search</button>
         <button id="tab-homefull" class="tab">Homefull</button>
         <button id="tab-sniping" class="tab">Wholesaler Sniping</button>
+        <button id="tab-list" class="tab">Buyers List</button>
+        <button id="tab-settings" class="tab">Settings</button>
       </div>
     </div>
-    <div class="right-actions" style="position:relative">
+    <div class="right-actions">
       <button id="darkToggle" class="switch" title="Toggle dark mode">🌙</button>
-      <button id="profileBtn" class="profile" title="Profile / Logout">
-        <span id="profileName" class="muted" style="font-weight:600">Log in</span>
-        <span id="profileInitials" class="profile-initials">?</span>
-      </button>
+      <button id="profileBtn" class="profile" title="Profile / Logout">👤</button>
       <div id="profileMenu" class="menu">
-        <button id="openLogin">Log in</button>
+        <button id="loginBtn">Login</button>
         <button id="logoutBtn">Logout</button>
       </div>
     </div>
   </div>
 
-  <!-- LOGIN MODAL -->
-  <div id="loginModal" class="modal">
-    <div class="panel">
-      <div style="font-weight:800; font-size:16px; margin-bottom:10px">Log in</div>
-      <div class="row">
-        <label class="label">Name
-          <input id="loginName" class="input" placeholder="Your name"/>
-        </label>
-      </div>
-      <div class="row">
-        <label class="label">Email
-          <input id="loginEmail" class="input" placeholder="you@company.com"/>
-        </label>
-      </div>
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px">
-        <button id="cancelLogin" class="btn btn-ghost">Cancel</button>
-        <button id="doLogin" class="btn btn-red">Log in</button>
-      </div>
-    </div>
-  </div>
-
   <!-- SEARCH + FILTERS -->
-  <div class="search-wrap">
+  <div class="search-wrap" id="searchWrap">
     <div class="card" style="position:relative">
       <div class="row-flex">
         <div class="grow">
@@ -197,20 +196,7 @@
             <option value="24">Last 24 mo</option>
           </select>
         </label>
-
-        <!-- NEW: Sort -->
-        <label class="label">
-          Sort
-          <select id="sortBy" class="sel">
-            <option value="distance_asc" selected>Distance (nearest first)</option>
-            <option value="temp_desc">Buyer Temperature % (high → low)</option>
-            <option value="contact_desc">Contacted (most → least)</option>
-            <option value="recent_desc">Soonest Purchase Date (most recent)</option>
-            <option value="deals_desc">Deals Purchased (most → least)</option>
-          </select>
-        </label>
-
-        <button id="searchBtn" class="btn btn-red">Search</button>
+        <button id="searchBtn" class="btn btn-dark">Search</button>
       </div>
       <div id="ac" class="card ac"></div>
     </div>
@@ -220,56 +206,116 @@
     <div id="map"></div>
 
     <aside class="sidebar" id="sidebar">
-      <div class="chips">
+      <!-- Shared chips (hidden on Buyers List / Settings) -->
+      <div class="chips" id="chips">
         <span class="chip" id="modeChip">Buyer Search</span>
         <span class="chip" id="chipMiles">2 mi</span>
         <span class="chip" id="chipMonths">12 mo</span>
       </div>
 
-      <div class="controls">
-        <label style="display:flex;align-items:center;gap:8px">
-          <input type="checkbox" id="selectAll"/>
-          <span class="muted">Select all</span>
-        </label>
-        <div style="display:flex;gap:8px;margin-left:auto">
-          <button id="bulkSkip" class="btn btn-red" disabled>Skip Trace Selected</button>
-        </div>
-      </div>
-
+      <!-- Metric tiles (only for Buyer Search) -->
       <div class="tile-grid" id="metricTiles">
         <div class="card tile">
           <div style="font-weight:600">🔨 Flippers</div>
           <div class="muted" style="margin-top:6px;font-size:12px;">avg price</div>
           <div id="avgFlip" style="font-weight:700;font-size:18px;">$—</div>
-          <div class="muted" style="font-size:12px;">activity last <span id="tileMonthsA">12</span> mo</div>
+          <div class="muted small">activity last <span id="tileMonthsA">12</span> mo</div>
         </div>
         <div class="card tile">
           <div style="font-weight:600">🏠 Landlords</div>
           <div class="muted" style="margin-top:6px;font-size:12px;">avg price</div>
           <div id="avgLand" style="font-weight:700;font-size:18px;">$—</div>
-          <div class="muted" style="font-size:12px;">activity last <span id="tileMonthsB">12</span> mo</div>
+          <div class="muted small">activity last <span id="tileMonthsB">12</span> mo</div>
         </div>
       </div>
 
-      <div id="results"></div>
+      <!-- Buyer Search content -->
+      <div id="searchContent">
+        <!-- bulk toolbar -->
+        <div class="tools">
+          <label style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" id="selectAll"/>
+            <span class="muted">Select all</span>
+          </label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="sortBy" class="sel">
+              <option value="temperature">Sort by Temperature (desc)</option>
+              <option value="distance">Sort by Distance (asc)</option>
+              <option value="contacted">Sort by Most Contacted</option>
+              <option value="last">Sort by Soonest Purchase Date</option>
+              <option value="deals">Sort by Deals (desc)</option>
+            </select>
+            <button id="bulkSkip" class="btn btn-red" disabled>Skip Trace Selected</button>
+          </div>
+        </div>
+        <div id="results"></div>
+      </div>
+
+      <!-- Buyers List content -->
+      <div id="listContent" style="display:none">
+        <div class="tools">
+          <div class="filters">
+            <input id="locFilter" class="input" style="width:260px" placeholder="Filter by location (city, state, zip)"/>
+            <label style="display:flex;align-items:center;gap:6px">
+              <input id="vipOnly" type="checkbox"/> <span class="muted">VIP only</span>
+            </label>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button id="exportCsv" class="btn btn-ghost">Export CSV</button>
+            <button id="exportCrm" class="btn btn-red">Export to CRM</button>
+          </div>
+        </div>
+        <div style="overflow:auto; max-height:calc(100vh - 220px)">
+          <table class="table" id="listTable">
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox" id="listSelectAll"/></th>
+                <th>Buyer</th>
+                <th>Type</th>
+                <th>Deals</th>
+                <th>Last</th>
+                <th>Median</th>
+                <th>Location</th>
+                <th>VIP</th>
+                <th>Contacted</th>
+              </tr>
+            </thead>
+            <tbody id="listTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Settings content -->
+      <div id="settingsContent" style="display:none">
+        <div class="row" style="display:grid; gap:12px">
+          <div style="font-weight:700">Integrations</div>
+          <label>Webhook URL (Export to CRM)
+            <input id="webhookUrl" class="input" placeholder="https://your-crm-webhook/ingest"/>
+          </label>
+          <label>API Key (optional, sent as header <code>X-API-Key</code>)
+            <input id="apiKey" class="input" placeholder="(optional)"/>
+          </label>
+          <div style="display:flex; gap:8px">
+            <button id="saveSettings" class="btn btn-red">Save</button>
+            <button id="testWebhook" class="btn btn-ghost">Send Test</button>
+          </div>
+          <div class="small muted">We only send selected buyers as JSON via POST to your webhook.</div>
+        </div>
+      </div>
     </aside>
   </div>
 
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
   <script>
     /* ===================== CONFIG ===================== */
-    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ'; // your pk token
-
-    /* ========== Replace these with your backend proxy endpoints ========== */
-    const API_SKIPTRACE_URL = '/api/skiptrace';          // POST { requester, buyers:[{id,name,phones,emails}] }
-    const API_FUB_ADD_URL   = '/api/fub/addBuyer';       // POST { requester, buyer, assignToEmail }
+    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ';
 
     /* ===================== DEMO DATA ===================== */
     const buyers = [
       { id:'b1', name:'Evergreen Residential LLC', buyer_type:'Flipper', contacts:[{phone:'210-555-0187'}]},
-      { id:'b2', name:'Alamo Rentals Group',      buyer_type:'Landlord', contacts:[{phone:'210-555-0142'}]},
-      { id:'b3', name:'River City Capital',       buyer_type:'Cash',     contacts:[{phone:'210-555-0199'}]},
-      { id:'b4', name:'Hill Country Flips',       buyer_type:'Flipper',  contacts:[{email:'offers@hillcountryflips.com'}]},
+      { id:'b2', name:'Alamo Rentals Group',       buyer_type:'Landlord', contacts:[{phone:'210-555-0142'}]},
+      { id:'b3', name:'River City Capital',        buyer_type:'Cash',     contacts:[{phone:'210-555-0199'}]},
+      { id:'b4', name:'Hill Country Flips',        buyer_type:'Flipper',  contacts:[{email:'offers@hillcountryflips.com'}]},
     ];
     const properties = [
       { id:'p1', addr1:'112 Blanco Rd', city:'San Antonio', state:'TX', zip:'78212', lat:29.462, lon:-98.501 },
@@ -289,34 +335,42 @@
       { id:'e7', buyer_id:'b4', property_id:'p6', event_type:'purchase', event_date:'2025-08-05', price:330000, source:'mls' },
     ];
 
-    /* ===================== AUTH (local) ===================== */
-    const LS_USER = 'fr_user';
-    function getUser(){ try{ return JSON.parse(localStorage.getItem(LS_USER)||'null'); }catch{ return null; } }
-    function setUser(u){ localStorage.setItem(LS_USER, JSON.stringify(u)); syncUserUI(); }
-    function clearUser(){ localStorage.removeItem(LS_USER); syncUserUI(); }
-
-    function initialsOf(name){ return (name||'?').split(' ').map(s=>s[0]||'').join('').slice(0,2).toUpperCase()||'?'; }
-    function syncUserUI(){
-      const u=getUser();
-      const nameEl=document.getElementById('profileName');
-      const iniEl=document.getElementById('profileInitials');
-      nameEl.textContent = u ? u.name : 'Log in';
-      iniEl.textContent = u ? initialsOf(u.name) : '?';
-    }
-
-    /* ===================== CONTACT COUNTS ===================== */
-    const LS_CONTACTS = 'fr_contacted';
-    function getContactCounts(){ try{ return JSON.parse(localStorage.getItem(LS_CONTACTS)||'{}'); }catch{ return {}; } }
-    function setContactCounts(m){ localStorage.setItem(LS_CONTACTS, JSON.stringify(m)); }
-    function incContact(id){
-      const m=getContactCounts(); m[id]=(m[id]||0)+1; setContactCounts(m);
-    }
-    function contactedCount(id){ const m=getContactCounts(); return m[id]||0; }
-
     /* ===================== STATE ===================== */
-    const INITIAL={lat:29.4241, lon:-98.4936}; // San Antonio
-    let mode='buyers', center={...INITIAL}, miles=2, months=12, sortBy='distance_asc';
-    const selected = new Set(); // bulk selection
+    const INITIAL={lat:29.4241, lon:-98.4936};
+    let mode='buyers', center={...INITIAL}, miles=2, months=12;
+
+    const selected = new Set(); // Buyer Search selections
+
+    /* ===================== LOCAL ‘DB’ (no server) ===================== */
+    const LS_BUYER_LIST = 'fr_buyer_list';
+    const LS_CONTACTED  = 'fr_contacted_counts';
+    const LS_SETTINGS   = 'fr_settings';
+    const LS_USER       = 'fr_user';
+
+    function getBuyerList(){
+      try{ return JSON.parse(localStorage.getItem(LS_BUYER_LIST)||'[]'); }catch{ return []; }
+    }
+    function setBuyerList(rows){ localStorage.setItem(LS_BUYER_LIST, JSON.stringify(rows)); }
+    function addToBuyerList(row){
+      const list = getBuyerList();
+      if(!list.find(x=>x.id===row.id)){ list.push(row); setBuyerList(list); }
+    }
+
+    function getContacted(){ try{ return JSON.parse(localStorage.getItem(LS_CONTACTED)||'{}'); }catch{ return {}; } }
+    function bumpContacted(id){
+      const m=getContacted(); m[id]=(m[id]||0)+1; localStorage.setItem(LS_CONTACTED, JSON.stringify(m));
+      return m[id];
+    }
+
+    function getSettings(){
+      try{ return JSON.parse(localStorage.getItem(LS_SETTINGS)||'{}'); }catch{ return {}; }
+    }
+    function setSettings(s){ localStorage.setItem(LS_SETTINGS, JSON.stringify(s)); }
+
+    function getUser(){
+      try{ return JSON.parse(localStorage.getItem(LS_USER)||'null'); }catch{ return null; }
+    }
+    function setUser(u){ localStorage.setItem(LS_USER, JSON.stringify(u)); }
 
     /* ===================== HELPERS ===================== */
     function monthsAgo(n){ const d=new Date(); d.setMonth(d.getMonth()-n); return d; }
@@ -338,9 +392,17 @@
       }
       return { type:'Feature', geometry:{type:'Polygon',coordinates:[coords]}, properties:{} };
     }
-    function totalDealsLastMonths(buyerId, mo){
-      const since=monthsAgo(mo);
-      return events.filter(e=>e.buyer_id===buyerId && e.event_type==='purchase' && new Date(e.event_date)>=since).length;
+
+    function latestInsideCoord(buyerId, cen, mi){
+      const since=monthsAgo(months);
+      const cand=events.filter(e=>e.buyer_id===buyerId && e.event_type==='purchase' && new Date(e.event_date)>=since)
+        .map(e=>{
+          const p=properties.find(pp=>pp.id===e.property_id); if(!p) return null;
+          const d=distanceMiles(cen,{lat:p.lat,lon:p.lon});
+          return d<=mi ? { e, p, d } : null;
+        }).filter(Boolean).sort((a,b)=> +new Date(b.e.event_date) - +new Date(a.e.event_date));
+      if(!cand.length) return null;
+      return [cand[0].p.lon, cand[0].p.lat];
     }
 
     function computeResults(cen,mi,mo){
@@ -354,53 +416,61 @@
       const by={};
       filtered.forEach(ev=>{
         const b=buyers.find(bb=>bb.id===ev.buyer_id); if(!b) return;
-        const prop=properties.find(pp=>pp.id===ev.property_id); if(!prop) return;
-        const dist=distanceMiles(cen,{lat:prop.lat,lon:prop.lon});
-        if(!by[b.id]){
-          by[b.id] = { buyer:b, deals:[], last:new Date(0), lastCoord:null, minDist:Infinity };
-        }
+        const p=properties.find(pp=>pp.id===ev.property_id);
+        by[b.id] = by[b.id] || { buyer:b, deals:[], last:new Date(0), lastCoord:null, lastProp:p };
         by[b.id].deals.push(ev);
-        if(dist<by[b.id].minDist) by[b.id].minDist = dist;
         const d=new Date(ev.event_date);
-        if(d>by[b.id].last){ by[b.id].last=d; by[b.id].lastCoord=[prop.lon,prop.lat]; }
+        if(d>by[b.id].last){
+          by[b.id].last=d;
+          by[b.id].lastCoord = p ? [p.lon,p.lat] : null;
+          by[b.id].lastProp  = p || by[b.id].lastProp;
+        }
       });
 
       const out = Object.values(by).map(v=>{
         const prices=v.deals.map(d=>d.price).sort((a,b)=>a-b);
         const mid=Math.floor(prices.length/2);
         const median=prices.length%2?prices[mid]:(prices[mid-1]+prices[mid])/2;
+        const dist = v.lastProp ? distanceMiles(cen,{lat:v.lastProp.lat,lon:v.lastProp.lon}) : 9999;
         return {
-          id:v.buyer.id, name:v.buyer.name, buyer_type:v.buyer.buyer_type, contacts:v.buyer.contacts,
-          deals:v.deals.length,          // true count inside timeframe
-          last:v.last, median,
-          coord:v.lastCoord, dist:v.minDist,
-          portfolio24: totalDealsLastMonths(v.buyer.id, 24),
+          id:v.buyer.id, name:v.buyer.name, buyer_type:v.buyer.buyer_type,
+          contacts:v.buyer.contacts,
+          deals:v.deals.length, last:v.last, median, coord:v.lastCoord,
+          location: v.lastProp ? `${v.lastProp.city}, ${v.lastProp.state} ${v.lastProp.zip}` : '—',
+          distance: dist
         };
       });
 
-      // default order (will be re-sorted by sortBy anyway)
-      out.sort((a,b)=> b.deals-a.deals || a.dist-b.dist || b.last-a.last);
-      return out;
+      // temperature score 0-100: recency (40) + frequency (35) + distance (15 inverse) + price-fit placeholder (10)
+      const now=Date.now();
+      out.forEach(r=>{
+        const days=Math.max(1, (now - r.last.getTime()) / (1000*60*60*24));
+        const rec=Math.max(0, 100 - Math.min(100, days/3));     // fresher => higher
+        const freq=Math.min(100, r.deals*15);                    // more deals => higher
+        const distScore=Math.max(0, 100 - Math.min(100, (r.distance/miles)*100)); // closer => higher
+        const price=70; // placeholder
+        r.temperature = Math.round(0.4*rec + 0.35*freq + 0.15*distScore + 0.1*price);
+      });
+
+      return out.sort((a,b)=> b.deals-a.deals || b.last-b.last);
     }
 
-    /* ====== Buyer Score ====== */
-    function buyerScore(r){
-      const prox = Math.max(0, Math.min(100, Math.round((1 - (r.dist / Math.max(0.1, miles))) * 100)));
-      const activity = Math.max(0, Math.min(100, r.deals * 20)); // cap ~5 deals
-      const portfolio = Math.max(0, Math.min(100, r.portfolio24 * 10)); // cap ~10
-      const days = Math.max(1, (Date.now() - r.last.getTime())/(1000*60*60*24));
-      const recency = Math.max(0, 100 - Math.min(100, Math.round(days / 3)));
-      return Math.max(0, Math.min(100, Math.round(0.25*prox + 0.25*activity + 0.15*portfolio + 0.35*recency)));
-    }
-    function scoreColor(p){ if (p < 40) return '#3b82f6'; if (p < 70) return '#f59e0b'; if (p < 90) return '#ef4444cc'; return '#ef4444'; }
-    function scoreEmoji(p){ return (p<40)?'🥶':(p<70?'🌡️':'🥵'); }
+    function colorForType(t){ return t==='Flipper'? '#3b82f6' : t==='Landlord'? '#22c55e' : '#ef4444'; }
+    function emojiFor(t){ return t==='Flipper'?'🛠️':(t==='Landlord'?'🏠':'💵'); }
 
     /* ===================== MAP ===================== */
     mapboxgl.accessToken = MAPBOX_TOKEN;
     const mapStyleLight = 'mapbox://styles/mapbox/light-v11';
     const mapStyleDark  = 'mapbox://styles/mapbox/dark-v11';
-    let map = new mapboxgl.Map({ container:'map', style: mapStyleLight, center:[INITIAL.lon,INITIAL.lat], zoom:11 });
+
+    let map = new mapboxgl.Map({
+      container:'map',
+      style: mapStyleLight,
+      center:[INITIAL.lon,INITIAL.lat],
+      zoom:11
+    });
     map.addControl(new mapboxgl.NavigationControl());
+
     function addRadiusSources(){
       if(map.getSource('radius')) return;
       map.addSource('radius',{ type:'geojson', data:circlePolygon(center.lon,center.lat,miles) });
@@ -409,6 +479,7 @@
     }
     map.on('load',()=>{ addRadiusSources(); refreshAll(true); });
     map.on('click', e=>{ center={lat:e.lngLat.lat, lon:e.lngLat.lng}; refreshAll(true); });
+
     function switchStyle(){
       const style = document.body.classList.contains('dark') ? mapStyleDark : mapStyleLight;
       map.setStyle(style);
@@ -417,19 +488,22 @@
 
     // DOM markers
     const markerById = new Map();
-    function clearMarkers(){ for(const {marker,popup} of markerById.values()){ popup.remove(); marker.remove(); } markerById.clear(); }
-    const emojiFor = t => t==='Flipper'?'🛠️':(t==='Landlord'?'🏠':'💵');
-    const colorFor = t => t==='Flipper'?'#3b82f6':(t==='Landlord'?'#22c55e':'#ef4444');
-    const labelFor = t => t==='Flipper'?'Flipper':(t==='Landlord'?'Landlord':'Cash');
+    function clearMarkers(){
+      for(const {marker,popup} of markerById.values()){ popup.remove(); marker.remove(); }
+      markerById.clear();
+    }
     function buildMarkers(results){
       clearMarkers();
       results.forEach(r=>{
-        const coords = r.coord || [center.lon,center.lat];
-        const el = document.createElement('div'); el.className = 'pin'; el.textContent = emojiFor(r.buyer_type);
-        el.style.backgroundColor = colorFor(r.buyer_type);
+        const coords = r.coord || latestInsideCoord(r.id, center, miles) || [center.lon,center.lat];
+        const el = document.createElement('div');
+        el.className = 'pin';
+        el.textContent = emojiFor(r.buyer_type);
+        el.style.backgroundColor = colorForType(r.buyer_type);
         const popup = new mapboxgl.Popup({ closeButton:false, offset: 12 })
           .setHTML(`<div style="font-weight:700">${r.name}</div>
-                    <div style="font-size:12px;opacity:.8">${labelFor(r.buyer_type)} • ~${r.dist.toFixed(2)} mi</div>`);
+                    <div style="font-size:12px;opacity:.8">${r.buyer_type}</div>
+                    <div class="small">Temp: ${r.temperature}%</div>`);
         const marker = new mapboxgl.Marker({ element: el, anchor:'center' }).setLngLat(coords).setPopup(popup).addTo(map);
         el.addEventListener('mouseenter', ()=> marker.togglePopup());
         el.addEventListener('mouseleave', ()=> marker.togglePopup());
@@ -441,45 +515,59 @@
     const tBuy=document.getElementById('tab-buyers');
     const tHome=document.getElementById('tab-homefull');
     const tSni=document.getElementById('tab-sniping');
+    const tList=document.getElementById('tab-list');
+    const tSet=document.getElementById('tab-settings');
+
+    const chips = document.getElementById('chips');
+    const metricTiles = document.getElementById('metricTiles');
+    const searchWrap = document.getElementById('searchWrap');
+    const searchContent = document.getElementById('searchContent');
+    const listContent = document.getElementById('listContent');
+    const settingsContent = document.getElementById('settingsContent');
+
     function setActive(){
       tBuy.classList.toggle('active',mode==='buyers');
       tHome.classList.toggle('active',mode==='homefull');
       tSni.classList.toggle('active',mode==='sniping');
+      tList.classList.toggle('active',mode==='list');
+      tSet.classList.toggle('active',mode==='settings');
+
       document.getElementById('modeChip').textContent =
-        mode==='buyers'?'Buyer Search':(mode==='homefull'?'Homefull':'Wholesaler Sniping');
-      document.getElementById('metricTiles').style.display = (mode==='buyers')?'grid':'none';
+        mode==='buyers'?'Buyer Search':(mode==='homefull'?'Homefull':(mode==='sniping'?'Wholesaler Sniping':'Buyers List'));
+
+      // Show/hide blocks
+      chips.style.display   = (mode==='buyers' || mode==='homefull' || mode==='sniping') ? 'flex' : 'none';
+      metricTiles.style.display = (mode==='buyers') ? 'grid' : 'none';
+      searchWrap.style.display  = (mode==='buyers' || mode==='homefull' || mode==='sniping') ? 'block' : 'none';
+      searchContent.style.display = (mode==='buyers') ? 'block' : 'none';
+      listContent.style.display   = (mode==='list') ? 'block' : 'none';
+      settingsContent.style.display = (mode==='settings') ? 'block' : 'none';
+
+      if(mode==='list'){ renderBuyersList(); }
     }
     tBuy.onclick=()=>{mode='buyers'; setActive(); refreshAll(false);}
     tHome.onclick=()=>{mode='homefull'; setActive(); refreshAll(false);}
     tSni.onclick=()=>{mode='sniping'; setActive(); refreshAll(false);}
+    tList.onclick=()=>{mode='list'; setActive();}
+    tSet.onclick=()=>{mode='settings'; setActive();}
 
+    // Dark mode + profile menu
     document.getElementById('darkToggle').onclick = ()=>{
       document.body.classList.toggle('dark');
+      document.getElementById('searchBtn').className = 'btn btn-dark';
       switchStyle();
     };
-
-    document.getElementById('miles').onchange = e=>{ miles=parseFloat(e.target.value); refreshAll(true); };
-    document.getElementById('months').onchange = e=>{ months=parseInt(e.target.value,10); refreshAll(false); };
-    document.getElementById('sortBy').onchange = e=>{ sortBy=e.target.value; refreshAll(false); };
-
-    // profile / login
     const profileBtn=document.getElementById('profileBtn');
     const profileMenu=document.getElementById('profileMenu');
-    profileBtn.onclick=()=>{ profileMenu.style.display = (profileMenu.style.display==='block')?'none':'block'; };
-    document.getElementById('openLogin').onclick=()=>{ profileMenu.style.display='none'; showLogin(true); };
-    document.getElementById('logoutBtn').onclick=()=>{ clearUser(); profileMenu.style.display='none'; };
-    function showLogin(show){
-      document.getElementById('loginModal').style.display = show?'flex':'none';
-      if(show){ document.getElementById('loginName').focus(); }
-    }
-    document.getElementById('cancelLogin').onclick=()=> showLogin(false);
-    document.getElementById('doLogin').onclick=()=>{
-      const name=document.getElementById('loginName').value.trim();
-      const email=document.getElementById('loginEmail').value.trim();
-      if(!name || !email){ alert('Enter name and email'); return; }
-      setUser({name,email}); showLogin(false);
-    };
-    syncUserUI();
+    profileBtn.onclick = ()=>{ profileMenu.style.display = profileMenu.style.display==='block' ? 'none' : 'block'; };
+    window.addEventListener('click',(e)=>{ if(!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) profileMenu.style.display='none'; });
+
+    document.getElementById('loginBtn').onclick = ()=> showLogin(true);
+    document.getElementById('logoutBtn').onclick = ()=>{ setUser(null); alert('Logged out'); };
+
+    // Controls
+    document.getElementById('miles').onchange = e=>{ miles=parseFloat(e.target.value); refreshAll(true); };
+    document.getElementById('months').onchange = e=>{ months=parseInt(e.target.value,10); refreshAll(false); };
 
     // search & autocomplete
     const ac=document.getElementById('ac');
@@ -515,51 +603,17 @@
         }).catch(()=>{});
     }
 
-    /* ===================== API Calls (proxy) ===================== */
-    async function enqueueSkiptrace(buyerObjs){
-      const u=getUser();
-      if(!u){ showLogin(true); return; }
-      try{
-        const res = await fetch(API_SKIPTRACE_URL, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({
-            requester: u,                            // {name,email}
-            buyers: buyerObjs                        // [{id,name,phones,emails}]
-          })
-        });
-        if(!res.ok) throw new Error('Skiptrace request failed');
-        alert('Skiptrace queued!');
-      }catch(e){ alert('Skiptrace error: '+e.message); }
-    }
-    async function sendToFollowUpBoss(buyerObj){
-      const u=getUser();
-      if(!u){ showLogin(true); return; }
-      try{
-        const res = await fetch(API_FUB_ADD_URL, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({
-            requester: u,
-            assignToEmail: u.email,
-            buyer: buyerObj
-          })
-        });
-        if(!res.ok) throw new Error('Follow Up Boss request failed');
-        alert('Sent to Follow Up Boss!');
-      }catch(e){ alert('FUB error: '+e.message); }
-    }
-
-    /* ===================== RENDER ===================== */
+    /* ===================== Buyer Search render ===================== */
     const resultsDiv = document.getElementById('results');
     const selectAllEl = document.getElementById('selectAll');
     const bulkBtn = document.getElementById('bulkSkip');
+    const sortBy = document.getElementById('sortBy');
 
     function updateBulkUI(){
       bulkBtn.disabled = selected.size===0;
-      const total = resultsDiv.querySelectorAll('.row[data-id]').length||0;
+      const total = resultsDiv.querySelectorAll('.row[data-id]').length;
       selectAllEl.indeterminate = selected.size>0 && selected.size < total;
-      selectAllEl.checked = total>0 && selected.size === total;
+      selectAllEl.checked = selected.size>0 && selected.size === total;
     }
 
     selectAllEl.addEventListener('change', ()=>{
@@ -572,179 +626,310 @@
       updateBulkUI();
     });
 
-    bulkBtn.addEventListener('click', ()=>{
+    sortBy.addEventListener('change', ()=> refreshAll(false));
+
+    bulkBtn.addEventListener('click', async ()=>{
       const ids=[...selected];
-      const buyersToSkip = ids.map(id=> allResults.find(r=>r.id===id)).filter(Boolean).map(r=>({
-        id:r.id, name:r.name,
-        phones:(r.contacts||[]).map(c=>c.phone).filter(Boolean),
-        emails:(r.contacts||[]).map(c=>c.email).filter(Boolean)
-      }));
-      enqueueSkiptrace(buyersToSkip);
-      ids.forEach(id=>incContact(id)); // count as contacted
-      refreshListOnly();               // update contacted badges
+      const res = getCurrentResults();
+      const payload = res.filter(r=>ids.includes(r.id)).map(toPayload);
+      await enqueueSkiptrace(payload);
+      ids.forEach(id=> bumpContacted(id));
+      refreshAll(false);
     });
 
-    function scoreColorHex(s){ return scoreColor(s); }
-    function resultRowHTML(r){
-      const color = r.buyer_type==='Flipper'?'blue':(r.buyer_type==='Landlord'?'green':'red');
-      const s = buyerScore(r);
-      const contacted = contactedCount(r.id);
-      return `
-        <div class="top" style="gap:10px">
-          <label style="display:flex;align-items:center;gap:8px">
-            <input type="checkbox" data-id="${r.id}"/>
-            <div>${r.name}</div>
-          </label>
-          <span class="badge ${color}">${r.buyer_type}</span>
-        </div>
-
-        <div class="score" title="Buyer Temperature">
-          <span class="thermo">${(s<40)?'🥶':(s<70?'🌡️':'🥵')}</span>
-          <div class="meter"><div class="fill" style="width:${s}%;background:${scoreColorHex(s)}"></div></div>
-          <span style="min-width:40px;text-align:right;font-weight:700">${s}%</span>
-        </div>
-
-        <div class="muted" style="display:flex;gap:8px;flex-wrap:wrap">
-          <span class="badge" style="background:#eef2ff;border-color:#eef2ff;color:#3730a3">Dist ~ ${r.dist.toFixed(2)} mi</span>
-          <span class="badge" style="background:#fef3c7;border-color:#fef3c7;color:#92400e">True count: ${r.deals}</span>
-          <span class="badge" style="background:#d1fae5;border-color:#d1fae5;color:#065f46">Portfolio 24m: ${r.portfolio24}</span>
-          <span class="badge" style="background:#fee2e2;border-color:#fee2e2;color:#7f1d1d">Last: ${r.last.toLocaleDateString()}</span>
-          <span class="badge" style="background:#e5e7eb;border-color:#e5e7eb;color:#111827">Contacted: ${contacted}×</span>
-        </div>
-
-        <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
-        <div class="actions">
-          <button class="btn btn-ghost" data-skip="${r.id}">Skip Trace</button>
-          <button class="btn btn-red" data-fub="${r.id}">+ Add to Buyers List</button>
-        </div>
-      `;
-    }
-
-    let allResults = [];
-    function applySort(list){
-      if(sortBy==='distance_asc'){
-        list.sort((a,b)=> a.dist-b.dist);
-      }else if(sortBy==='temp_desc'){
-        list.sort((a,b)=> buyerScore(b)-buyerScore(a));
-      }else if(sortBy==='contact_desc'){
-        list.sort((a,b)=> (contactedCount(b.id)||0) - (contactedCount(a.id)||0));
-      }else if(sortBy==='recent_desc'){
-        list.sort((a,b)=> b.last-a.last);
-      }else if(sortBy==='deals_desc'){
-        list.sort((a,b)=> b.deals-a.deals);
+    function getCurrentResults(){
+      const res = computeResults(center,miles,months);
+      const mode = sortBy.value;
+      // Sorting modes
+      if(mode==='distance') res.sort((a,b)=>a.distance-b.distance);
+      else if(mode==='temperature') res.sort((a,b)=>b.temperature-a.temperature);
+      else if(mode==='contacted'){
+        const c=getContacted();
+        res.sort((a,b)=>(c[b.id]||0)-(c[a.id]||0));
+      }else if(mode==='last'){
+        res.sort((a,b)=> b.last - a.last); // newest first
+      }else if(mode==='deals'){
+        res.sort((a,b)=> b.deals - a.deals);
       }
+      return res;
     }
 
     function refreshAll(fly){
+      // chips
       document.getElementById('chipMiles').textContent=`${miles} mi`;
       document.getElementById('chipMonths').textContent=`${months} mo`;
       document.getElementById('tileMonthsA').textContent=months;
       document.getElementById('tileMonthsB').textContent=months;
 
-      allResults = computeResults(center,miles,months);
-      applySort(allResults);
+      const res=getCurrentResults();
 
       // metrics
       const avg=a=>Math.round((a.reduce((x,y)=>x+y,0))/(a.length||1));
-      const flips=allResults.filter(r=>r.buyer_type==='Flipper').map(r=>r.median);
-      const lands=allResults.filter(r=>r.buyer_type==='Landlord').map(r=>r.median);
-      document.getElementById('avgFlip').textContent=`$${(flips.length?avg(flips):0).toLocaleString()}`;
-      document.getElementById('avgLand').textContent=`$${(lands.length?avg(lands):0).toLocaleString()}`;
+      const flips=res.filter(r=>r.buyer_type==='Flipper').map(r=>r.median);
+      const lands=res.filter(r=>r.buyer_type==='Landlord').map(r=>r.median);
+      document.getElementById('avgFlip').textContent=`$${avg(flips).toLocaleString()}`;
+      document.getElementById('avgLand').textContent=`$${avg(lands).toLocaleString()}`;
 
-      renderList();
-      buildMarkers(allResults);
+      // sidebar list
+      selected.clear();
+      resultsDiv.innerHTML='';
+      if(mode==='buyers'){
+        if(!res.length){
+          resultsDiv.innerHTML=`<div class="row muted">No active buyers found within ${miles} mi. Try widening the radius or time window.</div>`;
+        }else{
+          res.forEach(r=>{
+            const color = r.buyer_type==='Flipper'?'blue':(r.buyer_type==='Landlord'?'green':'red');
+            const contacted = getContacted()[r.id]||0;
+            const row=document.createElement('div'); row.className='row'; row.dataset.id=r.id;
+            const tempColor = r.temperature>=75? '#dc2626' : r.temperature>=50? '#f59e0b' : '#22c55e';
+            row.innerHTML=`
+              <div class="top" style="gap:10px">
+                <label style="display:flex;align-items:center;gap:8px">
+                  <input type="checkbox" data-id="${r.id}"/>
+                  <div>${r.name}</div>
+                </label>
+                <span class="badge ${color}">${r.buyer_type}</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <span class="therm-wrap">
+                  <span>🌡️ Buyer Score</span>
+                  <span class="therm-bar"><span class="therm-fill" style="width:${r.temperature}%; background:${tempColor}"></span></span>
+                  <b>${r.temperature}%</b>
+                </span>
+                <span class="badge" style="background:${r.buyer_type==='Flipper'?'#3b82f6':'#22c55e'};border-color:${r.buyer_type==='Flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
+                <span class="badge">📍 ${r.distance.toFixed(2)} mi</span>
+                <span class="muted"> Last: ${r.last.toLocaleDateString()}</span>
+                <span class="muted"> Median: $${r.median.toLocaleString()}</span>
+                <span class="muted"> ${r.location}</span>
+                <span class="muted"> Contacted: ${contacted}</span>
+              </div>
+              <div class="actions">
+                <button class="btn btn-ghost" data-skip="${r.id}">Skip Trace</button>
+                <button class="btn btn-dark" data-add="${r.id}">+ Add to Buyers List</button>
+              </div>`;
+
+            // hover -> show popup + ease map
+            row.addEventListener('mouseenter', ()=>{
+              const m = markerById.get(r.id); if(!m) return;
+              m.marker.togglePopup(); map.easeTo({ center:m.coords, duration:500, zoom:Math.max(map.getZoom(),11) });
+            });
+            row.addEventListener('mouseleave', ()=>{
+              const m = markerById.get(r.id); if(!m) return; m.marker.togglePopup();
+            });
+
+            // checkbox
+            row.querySelector('input[type="checkbox"]').addEventListener('change', (e)=>{
+              const id = e.target.dataset.id;
+              if(e.target.checked) selected.add(id); else selected.delete(id);
+              updateBulkUI();
+            });
+
+            // skiptrace
+            row.querySelector('[data-skip]').addEventListener('click', async ()=>{
+              await enqueueSkiptrace([toPayload(r)]);
+              bumpContacted(r.id);
+              refreshAll(false);
+            });
+            // add to list
+            row.querySelector('[data-add]').addEventListener('click', ()=>{
+              addToBuyerList({
+                id:r.id, name:r.name, buyer_type:r.buyer_type, deals:r.deals,
+                last_deal:r.last.toISOString(), median:r.median,
+                location:r.location, phones:collectPhones(r), emails:collectEmails(r), vip:false
+              });
+              alert(`${r.name} added to Buyers List.`);
+            });
+
+            resultsDiv.appendChild(row);
+          });
+        }
+      }else if(mode==='homefull'){
+        resultsDiv.innerHTML=`
+          <div class="row"><b>Homefull</b><div class="muted">AI-OCR on active & sold listings; agent leaderboard.</div></div>
+          <div class="row">
+            <div class="top"><div>506 Washington Blvd</div><span class="badge">Flip-Like 0.81</span></div>
+            <div class="muted">Staged • LVP • Subway tile • Matte black</div>
+            <div class="muted" style="margin-top:6px;">Agent: Leslie Elrod (432) 517-0038</div>
+            <div class="actions"><button class="btn btn-ghost">Call Agent</button><button class="btn btn-dark">Skiptrace Owner</button></div>
+          </div>`;
+      }else if(mode==='sniping'){
+        resultsDiv.innerHTML=`
+          <div class="row"><b>Wholesaler Sniping</b><div class="muted">Grantor → Grantee repeat pairs (last ${months} mo).</div></div>
+          <div class="row">
+            <div class="top"><div>ABC Investments LLC → Evergreen Homes LLC</div><span class="badge">6 in 12 mo</span></div>
+            <div class="muted">last_deal: 2025-06-11</div>
+            <div class="actions"><button class="btn btn-ghost">Skiptrace Buyer</button><button class="btn btn-dark">+ Add to Buyers List</button></div>
+          </div>`;
+      }
+
+      updateBulkUI();
+
+      // markers + radius
+      buildMarkers(res);
       const radiusSrc=map.getSource('radius'); if(radiusSrc) radiusSrc.setData(circlePolygon(center.lon,center.lat,miles));
       if(fly) map.flyTo({center:[center.lon,center.lat], zoom:Math.max(map.getZoom(),11), essential:true});
     }
 
-    function refreshListOnly(){
-      // updates the list (for contacted counts) without recomputing positions
-      const scrollTop = resultsDiv.scrollTop;
-      renderList();
-      resultsDiv.scrollTop = scrollTop;
+    function toPayload(r){
+      return {
+        id:r.id, name:r.name, buyer_type:r.buyer_type,
+        phones:collectPhones(r), emails:collectEmails(r),
+        deals:r.deals, last_deal:r.last.toISOString(), median:r.median,
+        location:r.location, temperature:r.temperature, distance:r.distance
+      };
+    }
+    function collectPhones(r){ return (r.contacts||[]).map(x=>x.phone).filter(Boolean); }
+    function collectEmails(r){ return (r.contacts||[]).map(x=>x.email).filter(Boolean); }
+
+    // Fake skiptrace (client-only) — still bumps "contacted"
+    async function enqueueSkiptrace(buyers){
+      const u=getUser(); if(!u){ showLogin(true); return; }
+      await new Promise(r=>setTimeout(r,400));
+      alert(`Skiptrace queued for:\n\n` + buyers.map(b=>`${b.name} (${(b.phones||[]).concat(b.emails||[]).join(' / ')||'no contact on file'})`).join('\n'));
     }
 
-    function renderList(){
-      selected.clear();
-      resultsDiv.innerHTML='';
-      if(mode!=='buyers'){
-        resultsDiv.innerHTML = mode==='homefull'
-          ? `<div class="row"><b>Homefull</b><div class="muted">AI-OCR on active & sold listings; agent leaderboard.</div></div>`
-          : `<div class="row"><b>Wholesaler Sniping</b><div class="muted">Grantor → Grantee repeat pairs (last ${months} mo).</div></div>`;
-        updateBulkUI(); return;
+    /* ===================== Buyers List ===================== */
+    const locFilter = document.getElementById('locFilter');
+    const vipOnly   = document.getElementById('vipOnly');
+    const exportCsv = document.getElementById('exportCsv');
+    const exportCrm = document.getElementById('exportCrm');
+    const listSelectAll = document.getElementById('listSelectAll');
+    const listTbody = document.getElementById('listTbody');
+
+    let listSelected = new Set();
+
+    function renderBuyersList(){
+      const q = (locFilter.value||'').toLowerCase();
+      const onlyVip = vipOnly.checked;
+      const rows = getBuyerList()
+        .filter(r => !q || (r.location||'').toLowerCase().includes(q))
+        .filter(r => !onlyVip || r.vip===true);
+
+      listSelected.clear();
+      listSelectAll.checked=false;
+
+      listTbody.innerHTML='';
+      if(!rows.length){
+        listTbody.innerHTML = `<tr><td colspan="9" class="small muted" style="padding:16px">No buyers saved yet.</td></tr>`;
+        return;
       }
-
-      if(!allResults.length){
-        resultsDiv.innerHTML=`<div class="row muted">No active buyers found within ${miles} mi. Try widening the radius or time window.</div>`;
-        updateBulkUI(); return;
-      }
-
-      allResults.forEach(r=>{
-        const row=document.createElement('div'); row.className='row'; row.dataset.id=r.id;
-        row.innerHTML = resultRowHTML(r);
-
-        // hover → popup + pan
-        row.addEventListener('mouseenter', ()=>{
-          const m = markerById.get(r.id); if(!m) return;
-          m.marker.togglePopup(); map.easeTo({ center:m.coords, duration:600, zoom:Math.max(map.getZoom(),11) });
+      rows.forEach(r=>{
+        const tr=document.createElement('tr');
+        const contacted = getContacted()[r.id]||0;
+        tr.innerHTML=`
+          <td><input type="checkbox" data-id="${r.id}"/></td>
+          <td>${r.name}</td>
+          <td>${r.buyer_type}</td>
+          <td>${r.deals||0}</td>
+          <td>${r.last_deal? new Date(r.last_deal).toLocaleDateString():'—'}</td>
+          <td>$${(r.median||0).toLocaleString()}</td>
+          <td>${r.location||'—'}</td>
+          <td><span class="star ${r.vip?'vip':''}" data-vip="${r.id}">${r.vip?'★':'☆'}</span></td>
+          <td>${contacted}</td>
+        `;
+        // select
+        tr.querySelector('[data-id]').addEventListener('change',(e)=>{
+          const id=e.target.dataset.id;
+          if(e.target.checked) listSelected.add(id); else listSelected.delete(id);
+          listSelectAll.checked = listSelected.size && listSelected.size===rows.length;
         });
-        row.addEventListener('mouseleave', ()=>{
-          const m = markerById.get(r.id); if(!m) return; m.marker.togglePopup();
-        });
-
-        // checkbox
-        row.querySelector('input[type="checkbox"]').addEventListener('change', (e)=>{
-          const id = e.target.dataset.id;
-          if(e.target.checked) selected.add(id); else selected.delete(id);
-          updateBulkUI();
-        });
-
-        // individual Skip Trace
-        row.querySelector('[data-skip]').addEventListener('click', ()=>{
-          const payload=[{
-            id:r.id, name:r.name,
-            phones:(r.contacts||[]).map(c=>c.phone).filter(Boolean),
-            emails:(r.contacts||[]).map(c=>c.email).filter(Boolean)
-          }];
-          enqueueSkiptrace(payload);
-          incContact(r.id);
-          refreshListOnly();
+        // VIP toggle
+        tr.querySelector('[data-vip]').addEventListener('click',()=>{
+          const list=getBuyerList();
+          const idx=list.findIndex(x=>x.id===r.id);
+          if(idx>=0){ list[idx].vip = !list[idx].vip; setBuyerList(list); renderBuyersList(); }
         });
 
-        // Add to FUB
-        row.querySelector('[data-fub]').addEventListener('click', ()=>{
-          const buyerObj={
-            id:r.id, name:r.name,
-            phones:(r.contacts||[]).map(c=>c.phone).filter(Boolean),
-            emails:(r.contacts||[]).map(c=>c.email).filter(Boolean),
-            buyer_type:r.buyer_type,
-            last_deal:r.last,
-            deals:r.deals,
-            median:r.median,
-            distance_mi:r.dist
-          };
-          sendToFollowUpBoss(buyerObj);
-          incContact(r.id);
-          refreshListOnly();
-        });
-
-        resultsDiv.appendChild(row);
+        listTbody.appendChild(tr);
       });
-
-      updateBulkUI();
     }
 
-    // Tabs + initial
-    (function init(){
-      // close profile menu on outside click
-      document.addEventListener('click',(e)=>{
-        if(!document.getElementById('profileBtn').contains(e.target) &&
-           !document.getElementById('profileMenu').contains(e.target)){
-          document.getElementById('profileMenu').style.display='none';
-        }
-      });
-      setActive();
-    })();
+    listSelectAll.addEventListener('change', ()=>{
+      const rows = [...listTbody.querySelectorAll('input[type="checkbox"][data-id]')];
+      listSelected.clear();
+      if(listSelectAll.checked) rows.forEach(cb=>{ cb.checked=true; listSelected.add(cb.dataset.id); });
+      else rows.forEach(cb=> cb.checked=false);
+    });
+    locFilter.addEventListener('input', renderBuyersList);
+    vipOnly.addEventListener('change', renderBuyersList);
+
+    exportCsv.addEventListener('click', ()=>{
+      const q=(locFilter.value||'').toLowerCase(), onlyVip=vipOnly.checked;
+      const rows = getBuyerList()
+        .filter(r => !q || (r.location||'').toLowerCase().includes(q))
+        .filter(r => !onlyVip || r.vip===true)
+        .filter(r => !listSelected.size || listSelected.has(r.id));
+
+      if(!rows.length){ alert('Nothing to export.'); return; }
+      const header=['id','name','type','deals','last_deal','median','location','vip','phones','emails'];
+      const csv=[header.join(',')].concat(rows.map(r=>{
+        const phones=(r.phones||[]).join('|'); const emails=(r.emails||[]).join('|');
+        return [r.id, r.name, r.buyer_type, r.deals||0, r.last_deal||'', r.median||0, `"${r.location||''}"`, r.vip?1:0, `"${phones}"`, `"${emails}"`].join(',');
+      })).join('\n');
+      const blob=new Blob([csv],{type:'text/csv'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='buyers_list.csv'; a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    exportCrm.addEventListener('click', async ()=>{
+      const settings=getSettings();
+      if(!settings.webhookUrl){ alert('Set a Webhook URL in Settings first.'); return; }
+      const rows = getBuyerList().filter(r=>!listSelected.size || listSelected.has(r.id));
+      if(!rows.length){ alert('Select some buyers first (or use Select All).'); return; }
+      try{
+        const resp=await fetch(settings.webhookUrl,{method:'POST', headers:{
+          'Content-Type':'application/json',
+          ...(settings.apiKey? {'X-API-Key': settings.apiKey} : {})
+        }, body:JSON.stringify({ source:'flip-radar', buyers:rows })});
+        if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        alert('Sent to CRM webhook.');
+      }catch(err){
+        alert('Failed to call webhook: '+err.message);
+      }
+    });
+
+    /* ===================== Settings ===================== */
+    const webhookUrl=document.getElementById('webhookUrl');
+    const apiKey=document.getElementById('apiKey');
+    const saveSettings=document.getElementById('saveSettings');
+    const testWebhook=document.getElementById('testWebhook');
+
+    function loadSettingsUI(){
+      const s=getSettings();
+      webhookUrl.value=s.webhookUrl||'';
+      apiKey.value=s.apiKey||'';
+    }
+    saveSettings.addEventListener('click', ()=>{
+      setSettings({ webhookUrl:webhookUrl.value.trim(), apiKey:apiKey.value.trim() });
+      alert('Saved.');
+    });
+    testWebhook.addEventListener('click', async ()=>{
+      const s=getSettings();
+      if(!s.webhookUrl){ alert('Set a Webhook URL first.'); return; }
+      try{
+        const resp=await fetch(s.webhookUrl,{method:'POST', headers:{
+          'Content-Type':'application/json',
+          ...(s.apiKey? {'X-API-Key': s.apiKey} : {})
+        }, body:JSON.stringify({ ping:'ok', ts:Date.now(), from:'flip-radar-test' })});
+        if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        alert('Webhook test sent.');
+      }catch(err){ alert('Webhook test failed: '+err.message); }
+    });
+
+    /* ===================== Login (client-only mock) ===================== */
+    function showLogin(redirectAfter){
+      const name=prompt('Enter your name (for assigning actions):');
+      if(!name) return;
+      setUser({ name });
+      alert(`Logged in as ${name}`);
+      if(redirectAfter && mode==='list') renderBuyersList();
+    }
+
+    /* ===================== INIT ===================== */
+    function getCurrentResults(){ return computeResults(center,miles,months); } // placeholder overwritten above
+    setActive();
+    loadSettingsUI();
+
   </script>
 </body>
 </html>
