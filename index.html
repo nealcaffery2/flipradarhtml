@@ -117,6 +117,14 @@
   .badge.red{ background:#ef4444; color:#fff; border-color:#ef4444 }
   .actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px }
 
+  /* Buyer Score meter */
+  .score { display:flex; align-items:center; gap:8px; }
+  .score .thermo { font-size:16px; line-height:1; }
+  .score .meter { flex:1; height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden; }
+  .dark .score .meter { background:#1f2a44; }
+  .score .fill { height:100%; width:0%; background:#3b82f6; transition:width .25s ease; border-radius:999px; }
+
+
   /* Emoji marker styling (background colored by buyer type) */
   .pin{
     width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -325,11 +333,25 @@
       return out;
     }
 
-    function smartMatch(r){
-      const days=Math.max(1,(Date.now()-r.last.getTime())/(1000*60*60*24));
-      const rec=Math.max(0,100-Math.min(100,days/3));
-      const freq=Math.min(100,r.deals*15);
-      return Math.round(0.6*rec+0.4*freq);
+ // Buyer Score: 0–100%
+function buyerScore(r){
+  const days = Math.max(1, (Date.now() - r.last.getTime()) / (1000*60*60*24));
+  const rec  = Math.max(0, 100 - Math.min(100, days/3));   // recency weight
+  const freq = Math.min(100, r.deals * 15);                // frequency weight
+  const pct  = Math.round(0.6*rec + 0.4*freq);
+  return Math.max(0, Math.min(100, pct));
+}
+function scoreColor(p){
+  if (p < 40) return '#3b82f6';      // cool (blue)
+  if (p < 70) return '#f59e0b';      // warm (amber)
+  if (p < 90) return '#ef4444cc';    // hot (red, slightly transparent)
+  return '#ef4444';                  // 🔥 hottest red
+}
+function scoreEmoji(p){
+  if (p < 40) return '🥶';
+  if (p < 70) return '🌡️';
+  return '🥵';
+}
     }
 
     /* ===================== MAP ===================== */
