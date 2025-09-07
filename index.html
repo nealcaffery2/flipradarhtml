@@ -8,7 +8,8 @@
 
 <style>
   :root{
-    --brand:#b91c1c;         /* Flip Radar red */
+    --brand:#b91c1c;         /* darker red */
+    --brand-press:#991b1b;   /* press state */
     --text:#0f172a;          /* slate-900 */
     --muted:#64748b;         /* slate-500 */
     --line:#e2e8f0;          /* slate-200 */
@@ -59,25 +60,33 @@
   .dark .switch{ background:var(--navy); color:#fff; border-color:#1f2a44 }
 
   /* Combined search */
-  .search-wrap{ position:fixed; z-index:20; left:50%; transform:translateX(-50%); top:72px; width:min(1040px,95vw) }
+  .search-wrap{
+    position:fixed; z-index:20; top:72px;
+    left:50%; transform:translateX(-50%);
+    width:min(1040px, calc(100vw - 460px)); /* won't overlap sidebar */
+  }
   .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
          box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 25px rgba(0,0,0,.06); padding:10px }
   .dark .card{ background:var(--navy); border-color:#1f2a44; box-shadow:none }
-  .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
-  .grow{ flex:1 1 320px }
-  .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text);
-          border-radius:10px; padding:10px 12px; font-size:14px; outline:0 }
+
+  .row-flex{
+    display:grid; align-items:center; gap:10px;
+    grid-template-columns: 1fr auto auto auto; /* address | miles | timeline | button */
+  }
+  .input, .sel, .btn{
+    height:40px; line-height:38px;
+    padding:0 12px; border-radius:10px;
+  }
+  .grow{ width:100% }
+  .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text); outline:0 }
   .dark .input{ border-color:#1f2a44 }
-  .sel{ border:1px solid var(--line); background:transparent; color:var(--text);
-        border-radius:10px; padding:9px 10px }
-  .dark .sel{ border-color:#1f2a44 }
   .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
-  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:10px 14px;
-        border-radius:12px; border:1px solid var(--line); cursor:pointer; white-space:nowrap }
-  .btn-dark{ background:#111827; color:#fff }
-  .btn-ghost{ background:transparent; color:var(--text) }
+  .sel{ border:1px solid var(--line); background:transparent; color:var(--text); min-width:110px }
+  .dark .sel{ border-color:#1f2a44 }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line); cursor:pointer; white-space:nowrap }
   .btn-red{ background:var(--brand); color:#fff; border-color:var(--brand) }
-  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) } /* red in dark */
+  .btn-red:hover{ background:var(--brand-press); border-color:var(--brand-press) }
+  .btn-ghost{ background:transparent; color:var(--text) }
 
   .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
        overflow:auto; border-radius:12px; display:none }
@@ -94,7 +103,6 @@
 
   .sidebar{ border-left:1px solid var(--line); background:var(--card); height:100vh; overflow:auto }
   .dark .sidebar{ border-left-color:#1f2a44 }
-  @media (max-width: 980px){ .sidebar{ height:auto } }
   .chips{ display:flex; gap:6px; align-items:center; padding:10px; border-bottom:1px solid var(--line) }
   .chip{ font-size:12px; background:var(--chip); border:1px solid var(--line); padding:4px 8px; border-radius:999px }
   .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:10px; border-bottom:1px solid var(--line) }
@@ -109,15 +117,28 @@
   .badge.red{ background:#ef4444; color:#fff; border-color:#ef4444 }
   .actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px }
 
-  /* Emoji marker styling */
+  /* Emoji marker styling (background colored by buyer type) */
   .pin{
     width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:18px;background:#fff;border:1px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,.2)
+    font-size:18px;line-height:1;user-select:none;
+    box-shadow:0 2px 6px rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.85); color:#fff;
   }
 
-  /* Select-all toolbar */
+  /* Bulk toolbar */
   .bulkbar{ position:sticky; top:0; z-index:5; background:var(--card); border-bottom:1px solid var(--line);
             display:flex; align-items:center; justify-content:space-between; padding:10px 12px }
+
+  /* Responsive for the search row */
+  @media (max-width: 980px){
+    .search-wrap{ width:min(1040px, 95vw); }
+    .row-flex{ grid-template-columns: 1fr auto auto; }
+    #searchBtn{ grid-column: 1 / -1; justify-self:end; }
+  }
+  @media (max-width: 520px){
+    .row-flex{ grid-template-columns: 1fr; }
+    .sel{ width:100%; }
+    #searchBtn{ width:100%; }
+  }
 </style>
 </head>
 <body>
@@ -128,9 +149,9 @@
       <a href="#" class="logo" aria-label="Flip Radar">
         <!-- red radar SVG -->
         <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="#e11d48" stroke-width="2"/>
-          <path d="M12 12 L19 7" stroke="#e11d48" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="19" cy="7" r="2" fill="#e11d48"/>
+          <circle cx="12" cy="12" r="9" stroke="#b91c1c" stroke-width="2"/>
+          <path d="M12 12 L19 7" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="19" cy="7" r="2" fill="#b91c1c"/>
         </svg>
         <span class="word">Flip&nbsp;Radar</span>
       </a>
@@ -165,7 +186,7 @@
             <option value="24">Last 24 mo</option>
           </select>
         </label>
-        <button id="searchBtn" class="btn btn-dark">Search</button>
+        <button id="searchBtn" class="btn btn-red">Search</button>
       </div>
       <div id="ac" class="card ac"></div>
     </div>
@@ -213,8 +234,8 @@
 
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
   <script>
-    /* ===================== CONFIG ===================== */
-    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ'; // <-- put your pk token
+    /* ============== CONFIG (your token already set) ============== */
+    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ';
 
     /* ===================== DEMO DATA ===================== */
     const buyers = [
@@ -268,7 +289,7 @@
       return { type:'Feature', geometry:{type:'Polygon',coordinates:[coords]}, properties:{} };
     }
 
-    // Compute results strictly within radius; also expose latest inside-radius coord for pin
+    // Compute results strictly within radius; track latest inside-radius coord
     function computeResults(cen,mi,mo){
       const since=monthsAgo(mo);
       const filtered=events.filter(e=>{
@@ -286,7 +307,7 @@
         if(d>by[b.id].last){
           by[b.id].last=d;
           const p=properties.find(pp=>pp.id===ev.property_id);
-          by[b.id].lastCoord = p ? [p.lon,p.lat] : null; // latest INSIDE-RADIUS coord
+          by[b.id].lastCoord = p ? [p.lon,p.lat] : null;
         }
       });
 
@@ -313,7 +334,7 @@
 
     /* ===================== MAP ===================== */
     mapboxgl.accessToken = MAPBOX_TOKEN;
-    const mapStyleLight = 'mapbox://styles/mapbox/light-v11';   // plainer style
+    const mapStyleLight = 'mapbox://styles/mapbox/light-v11';   // clean style
     const mapStyleDark  = 'mapbox://styles/mapbox/dark-v11';
 
     let map = new mapboxgl.Map({
@@ -339,68 +360,35 @@
       map.once('style.load',()=>{ addRadiusSources(); refreshAll(false); });
     }
 
-// DOM markers (PLAIN JS)
-const markerById = new Map();
+    /* ===================== MARKERS ===================== */
+    const markerById = new Map();
+    function clearMarkers(){
+      for(const {marker,popup} of markerById.values()){ popup.remove(); marker.remove(); }
+      markerById.clear();
+    }
+    const emojiFor = t => t==='Flipper'?'🛠️':(t==='Landlord'?'🏠':'💵');
+    const colorFor = t => t==='Flipper' ? '#3b82f6' : (t==='Landlord' ? '#22c55e' : '#ef4444');
+    const labelFor = t => t==='Flipper' ? 'Flipper' : (t==='Landlord' ? 'Landlord' : 'Cash');
 
-function clearMarkers() {
-  for (const { marker, popup } of markerById.values()) {
-    popup.remove();
-    marker.remove();
-  }
-  markerById.clear();
-}
+    function buildMarkers(results){
+      clearMarkers();
+      results.forEach(r=>{
+        const coords = r.coord || [center.lon,center.lat];
 
-function emojiFor(t) {
-  return t === 'Flipper' ? '🛠️' : t === 'Landlord' ? '🏠' : '💵';
-}
-function colorFor(t) {
-  return t === 'Flipper' ? '#3b82f6' : t === 'Landlord' ? '#22c55e' : '#ef4444';
-}
-function labelFor(t) {
-  return t === 'Flipper' ? 'Flipper' : t === 'Landlord' ? 'Landlord' : 'Cash';
-}
+        const el = document.createElement('div');
+        el.className = 'pin';
+        el.textContent = emojiFor(r.buyer_type);
+        el.style.backgroundColor = colorFor(r.buyer_type);
 
-function buildMarkers(results) {
-  clearMarkers();
+        const popup = new mapboxgl.Popup({ closeButton:false, offset: 12 })
+          .setHTML(`<div style="font-weight:700">${r.name}</div><div style="font-size:12px;opacity:.8">${labelFor(r.buyer_type)}</div>`);
 
-  results.forEach((r) => {
-    const coords = r.coord || [center.lon, center.lat];
-
-    // marker element with colored circular background
-    const el = document.createElement('div');
-    el.className = 'pin';
-    el.innerHTML = emojiFor(r.buyer_type);
-    el.style.width = '28px';
-    el.style.height = '28px';
-    el.style.borderRadius = '50%';
-    el.style.display = 'flex';
-    el.style.alignItems = 'center';
-    el.style.justifyContent = 'center';
-    el.style.fontSize = '18px';
-    el.style.lineHeight = '1';
-    el.style.userSelect = 'none';
-    el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.25)';
-    el.style.border = '1px solid rgba(255,255,255,0.8)';
-    el.style.backgroundColor = colorFor(r.buyer_type);
-    el.style.color = '#fff';
-
-    const popup = new mapboxgl.Popup({ closeButton: false, offset: 12 }).setHTML(
-      `<div style="font-weight:700">${r.name}</div>
-       <div style="font-size:12px;opacity:.8">${labelFor(r.buyer_type)}</div>`
-    );
-
-    const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
-      .setLngLat(coords)
-      .setPopup(popup)
-      .addTo(map);
-
-    // show popup on hover
-    el.addEventListener('mouseenter', () => marker.togglePopup());
-    el.addEventListener('mouseleave', () => marker.togglePopup());
-
-    markerById.set(r.id, { marker, popup, coords });
-  });
-}
+        const marker = new mapboxgl.Marker({ element: el, anchor:'center' }).setLngLat(coords).setPopup(popup).addTo(map);
+        el.addEventListener('mouseenter', ()=> marker.togglePopup());
+        el.addEventListener('mouseleave', ()=> marker.togglePopup());
+        markerById.set(r.id, { marker, popup, coords });
+      });
+    }
 
     /* ===================== UI WIRING ===================== */
     const tBuy=document.getElementById('tab-buyers');
@@ -420,8 +408,6 @@ function buildMarkers(results) {
 
     document.getElementById('darkToggle').onclick = ()=>{
       document.body.classList.toggle('dark');
-      // make Search + +Add buttons red while in dark mode
-      document.getElementById('searchBtn').className = document.body.classList.contains('dark') ? 'btn btn-red' : 'btn btn-dark';
       switchStyle();
     };
 
@@ -468,9 +454,10 @@ function buildMarkers(results) {
     const bulkBtn = document.getElementById('bulkSkip');
 
     function updateBulkUI(){
+      const total = resultsDiv.querySelectorAll('.row input[type="checkbox"][data-id]').length;
       bulkBtn.disabled = selected.size===0;
-      selectAllEl.indeterminate = selected.size>0 && selected.size < (resultsDiv.querySelectorAll('.row').length||0);
-      selectAllEl.checked = selected.size>0 && selected.size === (resultsDiv.querySelectorAll('.row').length||0);
+      selectAllEl.indeterminate = selected.size>0 && selected.size < total;
+      selectAllEl.checked = total>0 && selected.size === total;
     }
 
     selectAllEl.addEventListener('change', ()=>{
@@ -484,12 +471,10 @@ function buildMarkers(results) {
     });
 
     bulkBtn.addEventListener('click', ()=>{
-      // Here you’d kick off your BatchData bulk skiptrace.
       alert(`Bulk skiptrace for ${selected.size} selected buyers:\n\n` + [...selected].join('\n'));
     });
 
     function refreshAll(fly){
-      // chips
       document.getElementById('chipMiles').textContent=`${miles} mi`;
       document.getElementById('chipMonths').textContent=`${months} mo`;
       document.getElementById('tileMonthsA').textContent=months;
@@ -497,12 +482,11 @@ function buildMarkers(results) {
 
       const res=computeResults(center,miles,months);
 
-      // metrics
       const avg=a=>Math.round((a.reduce((x,y)=>x+y,0))/(a.length||1));
       const flips=res.filter(r=>r.buyer_type==='Flipper').map(r=>r.median);
       const lands=res.filter(r=>r.buyer_type==='Landlord').map(r=>r.median);
-      document.getElementById('avgFlip').textContent=`$${avg(flips).toLocaleString()}`;
-      document.getElementById('avgLand').textContent=`$${avg(lands).toLocaleString()}`;
+      document.getElementById('avgFlip').textContent = flips.length? `$${avg(flips).toLocaleString()}` : '$—';
+      document.getElementById('avgLand').textContent = lands.length? `$${avg(lands).toLocaleString()}` : '$—';
 
       // sidebar list
       selected.clear();
@@ -530,7 +514,7 @@ function buildMarkers(results) {
               <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
               <div class="actions">
                 <button class="btn btn-ghost">Skip Trace</button>
-                <button class="btn ${document.body.classList.contains('dark')?'btn-red':'btn-dark'}">+ Add to Buyers List</button>
+                <button class="btn btn-red">+ Add to Buyers List</button>
               </div>`;
             // hover a card -> show popup + center map
             row.addEventListener('mouseenter', ()=>{
@@ -557,7 +541,7 @@ function buildMarkers(results) {
             <div class="top"><div>506 Washington Blvd</div><span class="badge">Flip-Like 0.81</span></div>
             <div class="muted">Staged • LVP • Subway tile • Matte black</div>
             <div class="muted" style="margin-top:6px;">Agent: Leslie Elrod (432) 517-0038</div>
-            <div class="actions"><button class="btn btn-ghost">Call Agent</button><button class="btn ${document.body.classList.contains('dark')?'btn-red':'btn-dark'}">Skiptrace Owner</button></div>
+            <div class="actions"><button class="btn btn-ghost">Call Agent</button><button class="btn btn-red">Skiptrace Owner</button></div>
           </div>`;
       }else{
         resultsDiv.innerHTML=`
@@ -565,7 +549,7 @@ function buildMarkers(results) {
           <div class="row">
             <div class="top"><div>ABC Investments LLC → Evergreen Homes LLC</div><span class="badge">6 in 12 mo</span></div>
             <div class="muted">last_deal: 2025-06-11</div>
-            <div class="actions"><button class="btn btn-ghost">Skiptrace Buyer</button><button class="btn ${document.body.classList.contains('dark')?'btn-red':'btn-dark'}">+ Add to Buyers List</button></div>
+            <div class="actions"><button class="btn btn-ghost">Skiptrace Buyer</button><button class="btn btn-red">+ Add to Buyers List</button></div>
           </div>`;
       }
 
@@ -577,7 +561,7 @@ function buildMarkers(results) {
       if(fly) map.flyTo({center:[center.lon,center.lat], zoom:Math.max(map.getZoom(),11), essential:true});
     }
 
-    // tab + initial
+    // init tabs + initial render
     setActive();
   </script>
 </body>
