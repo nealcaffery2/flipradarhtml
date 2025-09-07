@@ -9,7 +9,7 @@
 <style>
   :root{
     --brand:#b91c1c;         /* darker red */
-    --brand-press:#991b1b;   /* press state */
+    --brand-600:#dc2626;     /* hover red */
     --text:#0f172a;          /* slate-900 */
     --muted:#64748b;         /* slate-500 */
     --line:#e2e8f0;          /* slate-200 */
@@ -17,6 +17,8 @@
     --chip:#f1f5f9;          /* slate-100 */
     --btn:#111827;           /* near black */
     --navy:#0c1220;          /* dark header/search */
+    --meter-bg:#e5e7eb;      /* light meter bg */
+    --meter-bg-dark:#1f2a44; /* dark meter bg */
   }
   .dark{
     --text:#e5e7eb;
@@ -60,33 +62,25 @@
   .dark .switch{ background:var(--navy); color:#fff; border-color:#1f2a44 }
 
   /* Combined search */
-  .search-wrap{
-    position:fixed; z-index:20; top:72px;
-    left:50%; transform:translateX(-50%);
-    width:min(1040px, calc(100vw - 460px)); /* won't overlap sidebar */
-  }
+  .search-wrap{ position:fixed; z-index:20; left:50%; transform:translateX(-50%); top:72px; width:min(1040px,95vw) }
   .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
          box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 25px rgba(0,0,0,.06); padding:10px }
   .dark .card{ background:var(--navy); border-color:#1f2a44; box-shadow:none }
-
-  .row-flex{
-    display:grid; align-items:center; gap:10px;
-    grid-template-columns: 1fr auto auto auto; /* address | miles | timeline | button */
-  }
-  .input, .sel, .btn{
-    height:40px; line-height:38px;
-    padding:0 12px; border-radius:10px;
-  }
-  .grow{ width:100% }
-  .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text); outline:0 }
+  .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+  .grow{ flex:1 1 360px; min-width:260px }
+  .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text);
+          border-radius:10px; padding:12px 12px; font-size:14px; outline:0 }
   .dark .input{ border-color:#1f2a44 }
-  .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
-  .sel{ border:1px solid var(--line); background:transparent; color:var(--text); min-width:110px }
+  .sel{ border:1px solid var(--line); background:transparent; color:var(--text);
+        border-radius:10px; padding:11px 10px }
   .dark .sel{ border-color:#1f2a44 }
-  .btn{ display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line); cursor:pointer; white-space:nowrap }
+  .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:11px 16px;
+        border-radius:12px; border:1px solid var(--line); cursor:pointer; white-space:nowrap; font-weight:600 }
+  .btn-dark{ background:var(--btn); color:#fff }
   .btn-red{ background:var(--brand); color:#fff; border-color:var(--brand) }
-  .btn-red:hover{ background:var(--brand-press); border-color:var(--brand-press) }
-  .btn-ghost{ background:transparent; color:var(--text) }
+  .btn-red:hover{ background:var(--brand-600); border-color:var(--brand-600) }
+  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) } /* red in dark */
 
   .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
        overflow:auto; border-radius:12px; display:none }
@@ -103,6 +97,7 @@
 
   .sidebar{ border-left:1px solid var(--line); background:var(--card); height:100vh; overflow:auto }
   .dark .sidebar{ border-left-color:#1f2a44 }
+  @media (max-width: 980px){ .sidebar{ height:auto } }
   .chips{ display:flex; gap:6px; align-items:center; padding:10px; border-bottom:1px solid var(--line) }
   .chip{ font-size:12px; background:var(--chip); border:1px solid var(--line); padding:4px 8px; border-radius:999px }
   .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:10px; border-bottom:1px solid var(--line) }
@@ -117,36 +112,23 @@
   .badge.red{ background:#ef4444; color:#fff; border-color:#ef4444 }
   .actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px }
 
-  /* Buyer Score meter */
-  .score { display:flex; align-items:center; gap:8px; }
-  .score .thermo { font-size:16px; line-height:1; }
-  .score .meter { flex:1; height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden; }
-  .dark .score .meter { background:#1f2a44; }
-  .score .fill { height:100%; width:0%; background:#3b82f6; transition:width .25s ease; border-radius:999px; }
-
-
-  /* Emoji marker styling (background colored by buyer type) */
+  /* Emoji marker styling (colored circular background) */
   .pin{
     width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:18px;line-height:1;user-select:none;
-    box-shadow:0 2px 6px rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.85); color:#fff;
+    font-size:18px;line-height:1;user-select:none;border:1px solid rgba(255,255,255,0.85);
+    box-shadow:0 2px 6px rgba(0,0,0,.25); color:#fff;
   }
 
-  /* Bulk toolbar */
+  /* Buyer Score meter */
+  .score { display:flex; align-items:center; gap:8px; margin:8px 0 4px 0; }
+  .score .thermo { font-size:16px; line-height:1; }
+  .score .meter { flex:1; height:8px; background:var(--meter-bg); border-radius:999px; overflow:hidden; }
+  .dark .score .meter { background:var(--meter-bg-dark); }
+  .score .fill { height:100%; width:0%; background:#3b82f6; transition:width .25s ease; border-radius:999px; }
+
+  /* Select-all toolbar */
   .bulkbar{ position:sticky; top:0; z-index:5; background:var(--card); border-bottom:1px solid var(--line);
             display:flex; align-items:center; justify-content:space-between; padding:10px 12px }
-
-  /* Responsive for the search row */
-  @media (max-width: 980px){
-    .search-wrap{ width:min(1040px, 95vw); }
-    .row-flex{ grid-template-columns: 1fr auto auto; }
-    #searchBtn{ grid-column: 1 / -1; justify-self:end; }
-  }
-  @media (max-width: 520px){
-    .row-flex{ grid-template-columns: 1fr; }
-    .sel{ width:100%; }
-    #searchBtn{ width:100%; }
-  }
 </style>
 </head>
 <body>
@@ -242,8 +224,8 @@
 
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
   <script>
-    /* ============== CONFIG (your token already set) ============== */
-    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ';
+    /* ===================== CONFIG ===================== */
+    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ'; // your pk token
 
     /* ===================== DEMO DATA ===================== */
     const buyers = [
@@ -271,10 +253,9 @@
     ];
 
     /* ===================== STATE ===================== */
-    const INITIAL={lat:29.4241, lon:-98.4936};
+    const INITIAL={lat:29.4241, lon:-98.4936}; // San Antonio
     let mode='buyers', center={...INITIAL}, miles=2, months=12;
-
-    const selected = new Set(); // for bulk selection
+    const selected = new Set(); // bulk selection
 
     /* ===================== HELPERS ===================== */
     function monthsAgo(n){ const d=new Date(); d.setMonth(d.getMonth()-n); return d; }
@@ -297,7 +278,13 @@
       return { type:'Feature', geometry:{type:'Polygon',coordinates:[coords]}, properties:{} };
     }
 
-    // Compute results strictly within radius; track latest inside-radius coord
+    // compute deals in last N months for a buyer (portfolio volume regardless of radius)
+    function totalDealsLastMonths(buyerId, mo){
+      const since=monthsAgo(mo);
+      return events.filter(e=>e.buyer_id===buyerId && e.event_type==='purchase' && new Date(e.event_date)>=since).length;
+    }
+
+    // Compute results strictly within radius; include: latest in-radius coord, distance, trueCount (in window), portfolio24 (last 24m)
     function computeResults(cen,mi,mo){
       const since=monthsAgo(mo);
       const filtered=events.filter(e=>{
@@ -309,13 +296,19 @@
       const by={};
       filtered.forEach(ev=>{
         const b=buyers.find(bb=>bb.id===ev.buyer_id); if(!b) return;
-        by[b.id] = by[b.id] || { buyer:b, deals:[], last:new Date(0), lastCoord:null };
+        const prop=properties.find(pp=>pp.id===ev.property_id); if(!prop) return;
+        const dist=distanceMiles(cen,{lat:prop.lat,lon:prop.lon});
+        if(!by[b.id]){
+          by[b.id] = {
+            buyer:b, deals:[], last:new Date(0), lastCoord:null, minDist:Infinity
+          };
+        }
         by[b.id].deals.push(ev);
+        if(dist<by[b.id].minDist) by[b.id].minDist = dist;
         const d=new Date(ev.event_date);
         if(d>by[b.id].last){
           by[b.id].last=d;
-          const p=properties.find(pp=>pp.id===ev.property_id);
-          by[b.id].lastCoord = p ? [p.lon,p.lat] : null;
+          by[b.id].lastCoord=[prop.lon,prop.lat];
         }
       });
 
@@ -323,40 +316,64 @@
         const prices=v.deals.map(d=>d.price).sort((a,b)=>a-b);
         const mid=Math.floor(prices.length/2);
         const median=prices.length%2?prices[mid]:(prices[mid-1]+prices[mid])/2;
+        const portfolio24 = totalDealsLastMonths(v.buyer.id, 24); // portfolio volume 24m
         return {
-          id:v.buyer.id, name:v.buyer.name, buyer_type:v.buyer.buyer_type, contacts:v.buyer.contacts,
-          deals:v.deals.length, last:v.last, median, coord:v.lastCoord
+          id:v.buyer.id,
+          name:v.buyer.name,
+          buyer_type:v.buyer.buyer_type,
+          contacts:v.buyer.contacts,
+          deals:v.deals.length,           // true count in timeframe
+          last:v.last,
+          median,
+          coord:v.lastCoord,
+          dist:v.minDist,                 // miles
+          portfolio24
         };
       });
 
-      out.sort((a,b)=> b.deals-a.deals || b.last-b.last);
+      // sort: most deals, then closest, then most recent
+      out.sort((a,b)=>{
+        if(b.deals!==a.deals) return b.deals-a.deals;
+        if(a.dist!==b.dist) return a.dist-b.dist;
+        return b.last-a.last;
+      });
       return out;
     }
 
- // Buyer Score: 0–100%
-function buyerScore(r){
-  const days = Math.max(1, (Date.now() - r.last.getTime()) / (1000*60*60*24));
-  const rec  = Math.max(0, 100 - Math.min(100, days/3));   // recency weight
-  const freq = Math.min(100, r.deals * 15);                // frequency weight
-  const pct  = Math.round(0.6*rec + 0.4*freq);
-  return Math.max(0, Math.min(100, pct));
-}
-function scoreColor(p){
-  if (p < 40) return '#3b82f6';      // cool (blue)
-  if (p < 70) return '#f59e0b';      // warm (amber)
-  if (p < 90) return '#ef4444cc';    // hot (red, slightly transparent)
-  return '#ef4444';                  // 🔥 hottest red
-}
-function scoreEmoji(p){
-  if (p < 40) return '🥶';
-  if (p < 70) return '🌡️';
-  return '🥵';
-}
+    /* ====== Buyer Score (0–100%) with distance + counts + portfolio + recency ====== */
+    function buyerScore(r){
+      // Distance factor: closer = higher. If radius=mi and dist in [0, mi], map to [100..0]
+      const prox = Math.max(0, Math.min(100, Math.round((1 - (r.dist / Math.max(0.1, miles))) * 100)));
+
+      // True count factor (deals in current window): 0→100 scaled
+      const activity = Math.max(0, Math.min(100, r.deals * 20)); // 5+ deals caps
+
+      // Portfolio factor (last 24 months across all areas)
+      const portfolio = Math.max(0, Math.min(100, r.portfolio24 * 10)); // 10+ caps
+
+      // Recency factor: days since last deal → lower is better
+      const days = Math.max(1, (Date.now() - r.last.getTime())/(1000*60*60*24));
+      const recency = Math.max(0, 100 - Math.min(100, Math.round(days / 3)));
+
+      // Weighted mix
+      const score = Math.round(0.25*prox + 0.25*activity + 0.15*portfolio + 0.35*recency);
+      return Math.max(0, Math.min(100, score));
+    }
+    function scoreColor(p){
+      if (p < 40) return '#3b82f6';      // cool (blue)
+      if (p < 70) return '#f59e0b';      // warm (amber)
+      if (p < 90) return '#ef4444cc';    // hot (red-ish)
+      return '#ef4444';                  // hottest red
+    }
+    function scoreEmoji(p){
+      if (p < 40) return '🥶';
+      if (p < 70) return '🌡️';
+      return '🥵';
     }
 
     /* ===================== MAP ===================== */
     mapboxgl.accessToken = MAPBOX_TOKEN;
-    const mapStyleLight = 'mapbox://styles/mapbox/light-v11';   // clean style
+    const mapStyleLight = 'mapbox://styles/mapbox/light-v11';   // plainer style
     const mapStyleDark  = 'mapbox://styles/mapbox/dark-v11';
 
     let map = new mapboxgl.Map({
@@ -382,29 +399,27 @@ function scoreEmoji(p){
       map.once('style.load',()=>{ addRadiusSources(); refreshAll(false); });
     }
 
-    /* ===================== MARKERS ===================== */
+    // DOM markers with colored circular background
     const markerById = new Map();
     function clearMarkers(){
       for(const {marker,popup} of markerById.values()){ popup.remove(); marker.remove(); }
       markerById.clear();
     }
     const emojiFor = t => t==='Flipper'?'🛠️':(t==='Landlord'?'🏠':'💵');
-    const colorFor = t => t==='Flipper' ? '#3b82f6' : (t==='Landlord' ? '#22c55e' : '#ef4444');
-    const labelFor = t => t==='Flipper' ? 'Flipper' : (t==='Landlord' ? 'Landlord' : 'Cash');
-
+    const colorFor = t => t==='Flipper'?'#3b82f6':(t==='Landlord'?'#22c55e':'#ef4444');
+    const labelFor = t => t==='Flipper'?'Flipper':(t==='Landlord'?'Landlord':'Cash');
     function buildMarkers(results){
       clearMarkers();
       results.forEach(r=>{
         const coords = r.coord || [center.lon,center.lat];
-
         const el = document.createElement('div');
         el.className = 'pin';
         el.textContent = emojiFor(r.buyer_type);
         el.style.backgroundColor = colorFor(r.buyer_type);
-
         const popup = new mapboxgl.Popup({ closeButton:false, offset: 12 })
-          .setHTML(`<div style="font-weight:700">${r.name}</div><div style="font-size:12px;opacity:.8">${labelFor(r.buyer_type)}</div>`);
-
+          .setHTML(`<div style="font-weight:700">${r.name}</div>
+                    <div style="font-size:12px;opacity:.8">${labelFor(r.buyer_type)}</div>
+                    <div style="font-size:12px;opacity:.8">~${r.dist.toFixed(2)} mi</div>`);
         const marker = new mapboxgl.Marker({ element: el, anchor:'center' }).setLngLat(coords).setPopup(popup).addTo(map);
         el.addEventListener('mouseenter', ()=> marker.togglePopup());
         el.addEventListener('mouseleave', ()=> marker.togglePopup());
@@ -430,8 +445,13 @@ function scoreEmoji(p){
 
     document.getElementById('darkToggle').onclick = ()=>{
       document.body.classList.toggle('dark');
+      // Search button turns red in both modes; ensure in dark it's red too
+      document.getElementById('searchBtn').className = 'btn btn-red';
       switchStyle();
     };
+
+    // make Search button red in light mode too (you asked for this)
+    document.getElementById('searchBtn').className = 'btn btn-red';
 
     document.getElementById('miles').onchange = e=>{ miles=parseFloat(e.target.value); refreshAll(true); };
     document.getElementById('months').onchange = e=>{ months=parseInt(e.target.value,10); refreshAll(false); };
@@ -476,8 +496,8 @@ function scoreEmoji(p){
     const bulkBtn = document.getElementById('bulkSkip');
 
     function updateBulkUI(){
-      const total = resultsDiv.querySelectorAll('.row input[type="checkbox"][data-id]').length;
       bulkBtn.disabled = selected.size===0;
+      const total = resultsDiv.querySelectorAll('.row[data-id]').length||0;
       selectAllEl.indeterminate = selected.size>0 && selected.size < total;
       selectAllEl.checked = total>0 && selected.size === total;
     }
@@ -493,10 +513,45 @@ function scoreEmoji(p){
     });
 
     bulkBtn.addEventListener('click', ()=>{
+      // Here you’d kick off your BatchData bulk skiptrace.
       alert(`Bulk skiptrace for ${selected.size} selected buyers:\n\n` + [...selected].join('\n'));
     });
 
+    function resultRowHTML(r){
+      const color = r.buyer_type==='Flipper'?'blue':(r.buyer_type==='Landlord'?'green':'red');
+      const s = buyerScore(r);
+      return `
+        <div class="top" style="gap:10px">
+          <label style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" data-id="${r.id}"/>
+            <div>${r.name}</div>
+          </label>
+          <span class="badge ${color}">${r.buyer_type}</span>
+        </div>
+
+        <div class="score" title="Buyer Score">
+          <span class="thermo">${(s<40)?'🥶':(s<70?'🌡️':'🥵')}</span>
+          <div class="meter"><div class="fill" style="width:${s}%;background:${scoreColor(s)}"></div></div>
+          <span style="min-width:40px;text-align:right;font-weight:700">${s}%</span>
+        </div>
+
+        <div class="muted" style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="badge" style="background:#eef2ff;border-color:#eef2ff;color:#3730a3">Dist ~ ${r.dist.toFixed(2)} mi</span>
+          <span class="badge" style="background:#fef3c7;border-color:#fef3c7;color:#92400e">True count: ${r.deals}</span>
+          <span class="badge" style="background:#d1fae5;border-color:#d1fae5;color:#065f46">Portfolio 24m: ${r.portfolio24}</span>
+          <span class="badge" style="background:#fee2e2;border-color:#fee2e2;color:#7f1d1d">Last: ${r.last.toLocaleDateString()}</span>
+        </div>
+
+        <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
+        <div class="actions">
+          <button class="btn">Skip Trace</button>
+          <button class="btn btn-red">+ Add to Buyers List</button>
+        </div>
+      `;
+    }
+
     function refreshAll(fly){
+      // chips
       document.getElementById('chipMiles').textContent=`${miles} mi`;
       document.getElementById('chipMonths').textContent=`${months} mo`;
       document.getElementById('tileMonthsA').textContent=months;
@@ -504,11 +559,12 @@ function scoreEmoji(p){
 
       const res=computeResults(center,miles,months);
 
+      // metrics
       const avg=a=>Math.round((a.reduce((x,y)=>x+y,0))/(a.length||1));
       const flips=res.filter(r=>r.buyer_type==='Flipper').map(r=>r.median);
       const lands=res.filter(r=>r.buyer_type==='Landlord').map(r=>r.median);
-      document.getElementById('avgFlip').textContent = flips.length? `$${avg(flips).toLocaleString()}` : '$—';
-      document.getElementById('avgLand').textContent = lands.length? `$${avg(lands).toLocaleString()}` : '$—';
+      document.getElementById('avgFlip').textContent=`$${(flips.length?avg(flips):0).toLocaleString()}`;
+      document.getElementById('avgLand').textContent=`$${(lands.length?avg(lands):0).toLocaleString()}`;
 
       // sidebar list
       selected.clear();
@@ -518,26 +574,9 @@ function scoreEmoji(p){
           resultsDiv.innerHTML=`<div class="row muted">No active buyers found within ${miles} mi. Try widening the radius or time window.</div>`;
         }else{
           res.forEach(r=>{
-            const color = r.buyer_type==='Flipper'?'blue':(r.buyer_type==='Landlord'?'green':'red');
             const row=document.createElement('div'); row.className='row'; row.dataset.id=r.id;
-            row.innerHTML=`
-              <div class="top" style="gap:10px">
-                <label style="display:flex;align-items:center;gap:8px">
-                  <input type="checkbox" data-id="${r.id}"/>
-                  <div>${r.name}</div>
-                </label>
-                <span class="badge ${color}">${r.buyer_type}</span>
-              </div>
-              <div>
-                <span class="badge" style="background:#fde68a;border-color:#fde68a;color:#92400e;">⚡ SmartMatch ${smartMatch(r)}</span>
-                <span class="badge" style="margin-left:6px;background:${r.buyer_type==='Flipper'?'#3b82f6':'#22c55e'};border-color:${r.buyer_type==='Flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
-                <span class="muted"> Last: ${r.last.toLocaleDateString()}</span>
-              </div>
-              <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
-              <div class="actions">
-                <button class="btn btn-ghost">Skip Trace</button>
-                <button class="btn btn-red">+ Add to Buyers List</button>
-              </div>`;
+            row.innerHTML = resultRowHTML(r);
+
             // hover a card -> show popup + center map
             row.addEventListener('mouseenter', ()=>{
               const m = markerById.get(r.id); if(!m) return;
@@ -546,7 +585,7 @@ function scoreEmoji(p){
             row.addEventListener('mouseleave', ()=>{
               const m = markerById.get(r.id); if(!m) return; m.marker.togglePopup();
             });
-            // checkbox
+            // checkbox wire
             row.querySelector('input[type="checkbox"]').addEventListener('change', (e)=>{
               const id = e.target.dataset.id;
               if(e.target.checked) selected.add(id); else selected.delete(id);
@@ -563,7 +602,7 @@ function scoreEmoji(p){
             <div class="top"><div>506 Washington Blvd</div><span class="badge">Flip-Like 0.81</span></div>
             <div class="muted">Staged • LVP • Subway tile • Matte black</div>
             <div class="muted" style="margin-top:6px;">Agent: Leslie Elrod (432) 517-0038</div>
-            <div class="actions"><button class="btn btn-ghost">Call Agent</button><button class="btn btn-red">Skiptrace Owner</button></div>
+            <div class="actions"><button class="btn">Call Agent</button><button class="btn btn-red">Skiptrace Owner</button></div>
           </div>`;
       }else{
         resultsDiv.innerHTML=`
@@ -571,7 +610,7 @@ function scoreEmoji(p){
           <div class="row">
             <div class="top"><div>ABC Investments LLC → Evergreen Homes LLC</div><span class="badge">6 in 12 mo</span></div>
             <div class="muted">last_deal: 2025-06-11</div>
-            <div class="actions"><button class="btn btn-ghost">Skiptrace Buyer</button><button class="btn btn-red">+ Add to Buyers List</button></div>
+            <div class="actions"><button class="btn">Skiptrace Buyer</button><button class="btn btn-red">+ Add to Buyers List</button></div>
           </div>`;
       }
 
@@ -583,7 +622,7 @@ function scoreEmoji(p){
       if(fly) map.flyTo({center:[center.lon,center.lat], zoom:Math.max(map.getZoom(),11), essential:true});
     }
 
-    // init tabs + initial render
+    // tab + initial
     setActive();
   </script>
 </body>
