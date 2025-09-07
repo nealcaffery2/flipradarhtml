@@ -1,72 +1,138 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Investorbase — Simple</title>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Flip Radar</title>
+<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet"/>
 
-  <style>
-    :root{
-      --blue:#0f6fb2; --accent:#ef4444; --card:#ffffff; --line:#e5e7eb; --text:#111827; --muted:#6b7280;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;color:var(--text);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+<style>
+  :root{
+    --brand:#e11d48;         /* red */
+    --text:#0f172a;          /* slate-900 */
+    --muted:#64748b;         /* slate-500 */
+    --line:#e2e8f0;          /* slate-200 */
+    --card:#ffffff;
+    --chip:#f1f5f9;          /* slate-100 */
+    --btn:#111827;           /* almost black */
+    --map-style: light;
+  }
+  .dark{
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --line:#1f2937;
+    --card:#0b0f1a;
+    --chip:#0f172a;
+    --btn:#e5e7eb;
+    --map-style: dark;
+    background:#0b0f1a;
+    color:var(--text);
+  }
 
-    .topbar{position:fixed;inset:0 0 auto 0;height:48px;z-index:30;background:var(--blue);color:#fff;display:flex;align-items:center;gap:12px;padding:0 14px;box-shadow:0 1px 4px rgba(0,0,0,.25)}
-    .brand{font-weight:700}
-    .tabs{display:flex;gap:6px}
-    .tabs button{color:#fff;background:transparent;border:0;padding:6px 10px;border-radius:8px;cursor:pointer}
-    .tabs button.active{background:#fff;color:#000}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;color:var(--text);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  a{color:inherit;text-decoration:none}
 
-    .search-wrap{position:fixed;z-index:20;left:50%;transform:translateX(-50%);top:64px;width:min(1040px,95vw)}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.05),0 10px 25px rgba(0,0,0,.06);padding:10px}
-    .row-flex{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-    .grow{flex:1 1 320px}
+  /* Top bar */
+  .topbar{
+    position:fixed; inset:0 0 auto 0; height:56px; z-index:30;
+    background:#fff; color:#000; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; padding:0 14px;
+  }
+  .top-left{display:flex; align-items:center; gap:12px}
+  .logo{display:flex; align-items:center; gap:8px}
+  .logo svg{height:22px; width:22px}
+  .logo .word{font-weight:800; letter-spacing:.2px; color:var(--brand)}
+  .tabs{display:flex; gap:6px}
+  .tabs button{
+    color:#0f172a; background:#fff; border:1px solid var(--line);
+    padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+    transition:.15s;
+  }
+  .tabs button:hover{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .tabs button.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .right-actions{display:flex; align-items:center; gap:8px}
+  .switch{border:1px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; background:#fff}
 
-    .input{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;font-size:14px;outline:0}
-    .sel{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 10px}
-    .label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:#000;color:#fff;cursor:pointer;white-space:nowrap}
+  /* Combined search box */
+  .search-wrap{ position:fixed; z-index:20; left:50%; transform:translateX(-50%); top:72px; width:min(1040px,95vw) }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
+         box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 25px rgba(0,0,0,.06); padding:10px }
+  .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+  .grow{ flex:1 1 320px }
+  .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text);
+          border-radius:10px; padding:10px 12px; font-size:14px; outline:0 }
+  .sel{ border:1px solid var(--line); background:transparent; color:var(--text);
+        border-radius:10px; padding:9px 10px }
+  .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:10px 14px;
+        border-radius:12px; border:1px solid var(--line); background:var(--btn); color:#fff;
+        cursor:pointer; white-space:nowrap }
+  .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
+       overflow:auto; border-radius:12px; display:none }
+  .ac button{ display:block; width:100%; text-align:left; padding:10px 12px; border:0;
+              background:var(--card); color:var(--text); cursor:pointer; border-bottom:1px solid var(--line) }
+  .ac button:last-child{ border-bottom:0 }
+  .ac button:hover{ background:#f3f4f6 }
 
-    .ac{position:absolute;left:10px;right:10px;top:calc(100% + 8px);max-height:280px;overflow:auto;border-radius:12px;display:none}
-    .ac button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:#fff;cursor:pointer;border-bottom:1px solid var(--line)}
-    .ac button:last-child{border-bottom:0}
-    .ac button:hover{background:#f3f4f6}
+  /* Layout */
+  .app{ height:100%; display:grid; grid-template-columns:1fr 420px; padding-top:56px }
+  @media (max-width: 980px){ .app{ grid-template-columns:1fr } }
+  #map{ width:100%; height:100% }
 
-    .app{height:100%;display:grid;grid-template-columns:1fr 420px;padding-top:48px}
-    @media (max-width: 980px){ .app{grid-template-columns: 1fr} }
+  .sidebar{ border-left:1px solid var(--line); background:var(--card); height:100vh; overflow:auto }
+  @media (max-width: 980px){ .sidebar{ height:auto } }
+  .chips{ display:flex; gap:6px; align-items:center; padding:10px; border-bottom:1px solid var(--line) }
+  .chip{ font-size:12px; background:var(--chip); border:1px solid var(--line); padding:4px 8px; border-radius:999px }
+  .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:10px; border-bottom:1px solid var(--line) }
+  @media (max-width: 420px){ .tile-grid{ grid-template-columns:1fr } }
+  .tile{ padding:10px }
+  .muted{ color:var(--muted) }
+  .row{ padding:12px; border-bottom:1px solid var(--line) }
+  .row .top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-weight:600 }
+  .badge{ font-size:11px; border:1px solid var(--line); padding:4px 8px; border-radius:999px }
+  .badge.blue{ background:#3b82f6; color:#fff; border-color:#3b82f6 }
+  .badge.green{ background:#22c55e; color:#fff; border-color:#22c55e }
+  .badge.red{ background:#ef4444; color:#fff; border-color:#ef4444 }
+  .actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px }
 
-    #map{width:100%;height:100%}
-    .sidebar{border-left:1px solid var(--line);background:#fff;height:100vh;overflow:auto}
-    @media (max-width: 980px){ .sidebar{height:auto} }
+  /* Emoji marker styling */
+  .pin{
+    width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:18px;background:#fff;border:1px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,.2)
+  }
+  .pin.blue{ border-color:#93c5fd; }
+  .pin.green{ border-color:#86efac; }
+  .pin.red{ border-color:#fecaca; }
 
-    .chips{display:flex;gap:6px;align-items:center;padding:10px;border-bottom:1px solid var(--line)}
-    .chip{font-size:12px;border:1px solid var(--line);background:#fff;padding:4px 8px;border-radius:999px}
-    .tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px;border-bottom:1px solid var(--line)}
-    @media (max-width: 420px){ .tile-grid{grid-template-columns:1fr} }
-    .tile{padding:10px}
-    .muted{color:var(--muted)}
-    .row{padding:12px;border-bottom:1px solid var(--line)}
-    .row .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-weight:600}
-    .badge{font-size:11px;border:1px solid var(--line);padding:4px 8px;border-radius:999px}
-    .badge.blue{background:#3b82f6;color:#fff;border-color:#3b82f6}
-    .badge.green{background:#22c55e;color:#fff;border-color:#22c55e}
-    .badge.red{background:#ef4444;color:#fff;border-color:#ef4444}
-    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-  </style>
+</style>
 </head>
 <body>
+
+  <!-- TOP BAR -->
   <div class="topbar">
-    <div class="brand">investorbase</div>
-    <div class="tabs">
-      <button id="tab-buyers" class="active">Buyer Search</button>
-      <button id="tab-homefull">Homefull</button>
-      <button id="tab-sniping">Wholesaler Sniping</button>
+    <div class="top-left">
+      <a href="#" class="logo" aria-label="Flip Radar">
+        <!-- simple red radar SVG logo -->
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="#e11d48" stroke-width="2"/>
+          <path d="M12 12 L19 7" stroke="#e11d48" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="19" cy="7" r="2" fill="#e11d48"/>
+        </svg>
+        <span class="word">Flip&nbsp;Radar</span>
+      </a>
+      <div class="tabs">
+        <button id="tab-buyers" class="active">Buyer Search</button>
+        <button id="tab-homefull">Homefull</button>
+        <button id="tab-sniping">Wholesaler Sniping</button>
+      </div>
+    </div>
+    <div class="right-actions">
+      <button id="darkToggle" class="switch" title="Toggle dark mode">🌙</button>
     </div>
   </div>
 
-  <!-- Combined address + filters -->
+  <!-- SEARCH + FILTERS (ONE BOX) -->
   <div class="search-wrap">
     <div class="card" style="position:relative">
       <div class="row-flex">
@@ -123,10 +189,10 @@
 
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
   <script>
-    /***** CONFIG *****/
-    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZmE1djgzdTFpYzkyanBzeTRvcWhtZjYifQ.YRXBgtdmwKq61aljOzx8OQ'; // <-- set your pk token
+    /* ===================== CONFIG ===================== */
+    const MAPBOX_TOKEN = 'pk.YOUR_MAPBOX_TOKEN_HERE'; // <-- put your pk token
 
-    /***** DEMO DATA *****/
+    /* ===================== DEMO DATA ===================== */
     const buyers = [
       { id:'b1', name:'Evergreen Residential LLC', buyer_type:'flipper', contacts:[{phone:'210-555-0187'}]},
       { id:'b2', name:'Alamo Rentals Group',      buyer_type:'landlord', contacts:[{phone:'210-555-0142'}]},
@@ -151,7 +217,7 @@
       { id:'e7', buyer_id:'b4', property_id:'p6', event_type:'purchase', event_date:'2025-08-05', price:330000, source:'mls' },
     ];
 
-    /***** HELPERS *****/
+    /* ===================== HELPERS ===================== */
     const INITIAL={lat:29.4241, lon:-98.4936};
     let mode='buyers', center={...INITIAL}, miles=2, months=12;
 
@@ -204,117 +270,77 @@
       return Math.round(0.6*rec+0.4*freq);
     }
 
-    /***** MAP *****/
+    /* ===================== MAP (DOM MARKERS + EMOJIS) ===================== */
     mapboxgl.accessToken = MAPBOX_TOKEN;
-    const map=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/streets-v12',center:[INITIAL.lon,INITIAL.lat],zoom:11});
+
+    const mapStyleLight = 'mapbox://styles/mapbox/navigation-day-v1';
+    const mapStyleDark  = 'mapbox://styles/mapbox/dark-v11';
+
+    let map = new mapboxgl.Map({
+      container:'map',
+      style: mapStyleLight,
+      center:[INITIAL.lon,INITIAL.lat],
+      zoom:11
+    });
     map.addControl(new mapboxgl.NavigationControl());
 
-    map.on('load', ()=>{
-      
-      map.addSource('buyers',{ type:'geojson', data:{type:'FeatureCollection',features:[]}, cluster:true, clusterRadius:40 });
+    // sources for radius (DOM markers don't need a source)
+    function addRadiusSources(){
+      if(map.getSource('radius')) return;
       map.addSource('radius',{ type:'geojson', data:circlePolygon(center.lon,center.lat,miles) });
-
-      map.addLayer({ id:'buyers-clusters', type:'circle', source:'buyers', filter:['has','point_count'],
-        paint:{ 'circle-color':'#0ea5e9','circle-radius':['step',['get','point_count'],16,10,22,50,28],'circle-stroke-color':'#fff','circle-stroke-width':1.5 }});
-      map.addLayer({ id:'buyers-count', type:'symbol', source:'buyers', filter:['has','point_count'],
-        layout:{ 'text-field':'{point_count_abbreviated}','text-size':12 }, paint:{ 'text-color':'#111' }});
-
-      map.addLayer({ id:'buyers-points', type:'circle', source:'buyers', filter:['!',['has','point_count']],
-        paint:{ 'circle-radius':6,'circle-stroke-width':1.25,'circle-stroke-color':'#fff',
-                'circle-color':['match',['get','buyer_type'],'flipper','#3b82f6','landlord','#22c55e','#ef4444'] }});
-
       map.addLayer({ id:'radius-fill', type:'fill', source:'radius', paint:{ 'fill-color':'#ef4444','fill-opacity':0.08 }});
       map.addLayer({ id:'radius-line', type:'line', source:'radius', paint:{ 'line-color':'#ef4444','line-width':2 }});
+    }
+    map.on('load',()=>{ addRadiusSources(); refreshAll(true); });
 
-      // Tooltip popup for single points
-      const popup=new mapboxgl.Popup({closeButton:false,closeOnClick:false});
-      map.on('mousemove','buyers-points', e=>{
-        map.getCanvas().style.cursor='pointer';
-        const f=e.features?.[0];
-        if(!f) return;
-        const { name, buyer_type }=f.properties || {};
-        const [x,y]=f.geometry.coordinates;
-        popup.setLngLat([x,y]).setHTML(`<div style="font-weight:600">${name||'Unknown'}</div><div style="font-size:12px;color:#555">${buyer_type||'buyer'}</div>`).addTo(map);
-      });
-      map.on('mouseleave','buyers-points', ()=>{ map.getCanvas().style.cursor=''; popup.remove(); });
-
-      refreshAll(true);
-    });
-
-    map.on('click', e=>{
-      center={ lat:e.lngLat.lat, lon:e.lngLat.lng };
-      refreshAll(true);
-    });
-
-    function refreshAll(fly){
-      // chips
-      document.getElementById('chipMiles').textContent=`${miles} mi`;
-      document.getElementById('chipMonths').textContent=`${months} mo`;
-      document.getElementById('tileMonthsA').textContent=months;
-      document.getElementById('tileMonthsB').textContent=months;
-
-      const res=computeResults(center,miles,months);
-
-      // metrics
-      const avg=a=>Math.round((a.reduce((x,y)=>x+y,0))/(a.length||1));
-      const flips=res.filter(r=>r.buyer_type==='flipper').map(r=>r.median);
-      const lands=res.filter(r=>r.buyer_type==='landlord').map(r=>r.median);
-      document.getElementById('avgFlip').textContent=`$${avg(flips).toLocaleString()}`;
-      document.getElementById('avgLand').textContent=`$${avg(lands).toLocaleString()}`;
-
-      // sidebar
-      const list=document.getElementById('results'); list.innerHTML='';
-      if(mode==='buyers'){
-        if(!res.length){
-          list.innerHTML=`<div class="row muted">No active buyers found. Try increasing the radius or time window.</div>`;
-        }else{
-          res.forEach(r=>{
-            const color = r.buyer_type==='flipper'?'blue':(r.buyer_type==='landlord'?'green':'red');
-            const row=document.createElement('div'); row.className='row';
-            row.innerHTML=`
-              <div class="top"><div>${r.name}</div><span class="badge ${color}">${r.buyer_type}</span></div>
-              <div>
-                <span class="badge" style="background:#fde68a;border-color:#fde68a;color:#92400e;">⚡ SmartMatch ${smartMatch(r)}</span>
-                <span class="badge" style="margin-left:6px;background:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};border-color:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
-                <span class="muted"> Last: ${r.last.toLocaleDateString()}</span>
-              </div>
-              <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
-              <div class="actions"><button class="btn" style="background:#fff;color:#000">Send to Zapier</button><button class="btn">+ Add to Buyers List</button></div>`;
-            list.appendChild(row);
-          });
-        }
-      }else if(mode==='homefull'){
-        list.innerHTML=`
-          <div class="row"><b>Homefull</b><div class="muted">Active & sold listings flagged as rehab/staged; agent leaderboard.</div></div>
-          <div class="row">
-            <div class="top"><div>506 Washington Blvd</div><span class="badge">Flip-Like 0.81</span></div>
-            <div class="muted">Staged • LVP • Subway tile • Matte black</div>
-            <div class="muted" style="margin-top:6px;">Agent: Leslie Elrod (432) 517-0038</div>
-            <div class="actions"><button class="btn" style="background:#fff;color:#000">Call Agent</button><button class="btn">Skiptrace Owner</button></div>
-          </div>`;
-      }else{
-        list.innerHTML=`
-          <div class="row"><b>Wholesaler Sniping</b><div class="muted">Grantor → Grantee repeat pairs (last ${months} mo).</div></div>
-          <div class="row">
-            <div class="top"><div>ABC Investments LLC → Evergreen Homes LLC</div><span class="badge">6 in 12 mo</span></div>
-            <div class="muted">last_deal: 2025-06-11</div>
-            <div class="actions"><button class="btn" style="background:#fff;color:#000">Skiptrace Buyer</button><button class="btn">+ Add to Buyers List</button></div>
-          </div>`;
-      }
-
-      // map features
-      const feats = res.map(r=>{
-        const last = events.filter(e=>e.buyer_id===r.id).sort((a,b)=>+new Date(b.event_date)-+new Date(a.event_date))[0];
-        const p = properties.find(pp=>pp.id===last?.property_id) || {lon:center.lon,lat:center.lat};
-        return { type:'Feature', geometry:{type:'Point',coordinates:[p.lon,p.lat]}, properties:{ name:r.name, buyer_type:r.buyer_type, id:r.id } };
-      });
-      const buyersSrc=map.getSource('buyers'); if(buyersSrc) buyersSrc.setData({type:'FeatureCollection',features:feats});
-      const radiusSrc=map.getSource('radius'); if(radiusSrc) radiusSrc.setData(circlePolygon(center.lon,center.lat,miles));
-      if(fly) map.flyTo({center:[center.lon,center.lat], zoom:Math.max(map.getZoom(),11), essential:true});
+    // switch styles when dark mode toggles
+    function switchStyle(){
+      const style = document.body.classList.contains('dark') ? mapStyleDark : mapStyleLight;
+      map.setStyle(style);
+      map.once('style.load',()=>{ addRadiusSources(); refreshAll(false); });
     }
 
-    /***** UI *****/
-    // tabs
+    // DOM markers
+    const markerById = new Map();     // id -> { marker, popup, coords }
+    function clearMarkers(){
+      for(const {marker,popup} of markerById.values()){ popup.remove(); marker.remove(); }
+      markerById.clear();
+    }
+    function emojiFor(type){
+      if(type==='flipper') return '🛠️';
+      if(type==='landlord') return '🏠';
+      return '💵';
+    }
+    function colorFor(type){
+      if(type==='flipper') return 'blue';
+      if(type==='landlord') return 'green';
+      return 'red';
+    }
+
+    function buildMarkers(results){
+      clearMarkers();
+      results.forEach(r=>{
+        const last = events.filter(e=>e.buyer_id===r.id).sort((a,b)=>+new Date(b.event_date)-+new Date(a.event_date))[0];
+        const p = properties.find(pp=>pp.id===last?.property_id) || {lon:center.lon,lat:center.lat};
+        const el = document.createElement('div');
+        el.className = `pin ${colorFor(r.buyer_type)}`;
+        el.textContent = emojiFor(r.buyer_type);
+        const popup = new mapboxgl.Popup({ closeButton:false, offset: 12 })
+          .setHTML(`<div style="font-weight:700">${r.name}</div><div style="font-size:12px;color:#555">${r.buyer_type}</div>`);
+
+        const marker = new mapboxgl.Marker({ element: el }).setLngLat([p.lon,p.lat]).setPopup(popup).addTo(map);
+
+        el.addEventListener('mouseenter', ()=> marker.togglePopup());
+        el.addEventListener('mouseleave', ()=> marker.togglePopup());
+
+        markerById.set(r.id, { marker, popup, coords:[p.lon,p.lat] });
+      });
+    }
+
+    // click to recenter
+    map.on('click', e=>{ center={lat:e.lngLat.lat, lon:e.lngLat.lng}; refreshAll(true); });
+
+    /* ===================== UI ===================== */
     const tBuy=document.getElementById('tab-buyers');
     const tHome=document.getElementById('tab-homefull');
     const tSni=document.getElementById('tab-sniping');
@@ -322,18 +348,25 @@
       tBuy.classList.toggle('active',mode==='buyers');
       tHome.classList.toggle('active',mode==='homefull');
       tSni.classList.toggle('active',mode==='sniping');
-      document.getElementById('modeChip').textContent = mode==='buyers'?'Buyer Search':(mode==='homefull'?'Homefull':'Wholesaler Sniping');
+      document.getElementById('modeChip').textContent =
+        mode==='buyers'?'Buyer Search':(mode==='homefull'?'Homefull':'Wholesaler Sniping');
       document.getElementById('metricTiles').style.display = (mode==='buyers')?'grid':'none';
     }
-    tBuy.onclick=()=>{mode='buyers';setActive();refreshAll(false);}
-    tHome.onclick=()=>{mode='homefull';setActive();refreshAll(false);}
-    tSni.onclick=()=>{mode='sniping';setActive();refreshAll(false);}
+    tBuy.onclick=()=>{mode='buyers'; setActive(); refreshAll(false);}
+    tHome.onclick=()=>{mode='homefull'; setActive(); refreshAll(false);}
+    tSni.onclick=()=>{mode='sniping'; setActive(); refreshAll(false);}
 
-    // filters
+    // dark mode toggle
+    document.getElementById('darkToggle').onclick = ()=>{
+      document.body.classList.toggle('dark');
+      switchStyle();
+    };
+
+    // filter chips
     document.getElementById('miles').onchange = e=>{ miles=parseFloat(e.target.value); refreshAll(true); };
     document.getElementById('months').onchange = e=>{ months=parseInt(e.target.value,10); refreshAll(false); };
 
-    // search + autocomplete
+    // search + autocomplete (Mapbox geocoding)
     const ac=document.getElementById('ac');
     const search=document.getElementById('search');
     document.getElementById('searchBtn').onclick = ()=> doSearch(search.value);
@@ -357,7 +390,6 @@
           }).catch(()=>{});
       }, 200);
     });
-
     function doSearch(q){
       const s=q.trim(); if(!s) return;
       fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(s)}.json?access_token=${MAPBOX_TOKEN}&limit=1&country=us`)
@@ -368,6 +400,80 @@
           refreshAll(true);
         }).catch(()=>{});
     }
+
+    /* ===================== RENDER ===================== */
+    function refreshAll(fly){
+      // chips
+      document.getElementById('chipMiles').textContent=`${miles} mi`;
+      document.getElementById('chipMonths').textContent=`${months} mo`;
+      document.getElementById('tileMonthsA').textContent=months;
+      document.getElementById('tileMonthsB').textContent=months;
+
+      const res=computeResults(center,miles,months);
+
+      // metrics
+      const avg=a=>Math.round((a.reduce((x,y)=>x+y,0))/(a.length||1));
+      const flips=res.filter(r=>r.buyer_type==='flipper').map(r=>r.median);
+      const lands=res.filter(r=>r.buyer_type==='landlord').map(r=>r.median);
+      document.getElementById('avgFlip').textContent=`$${avg(flips).toLocaleString()}`;
+      document.getElementById('avgLand').textContent=`$${avg(lands).toLocaleString()}`;
+
+      // sidebar list
+      const list=document.getElementById('results'); list.innerHTML='';
+      if(mode==='buyers'){
+        if(!res.length){
+          list.innerHTML=`<div class="row muted">No active buyers found. Try increasing the radius or time window.</div>`;
+        }else{
+          res.forEach(r=>{
+            const color = r.buyer_type==='flipper'?'blue':(r.buyer_type==='landlord'?'green':'red');
+            const row=document.createElement('div'); row.className='row'; row.dataset.id=r.id;
+            row.innerHTML=`
+              <div class="top"><div>${r.name}</div><span class="badge ${color}">${r.buyer_type}</span></div>
+              <div>
+                <span class="badge" style="background:#fde68a;border-color:#fde68a;color:#92400e;">⚡ SmartMatch ${smartMatch(r)}</span>
+                <span class="badge" style="margin-left:6px;background:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};border-color:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
+                <span class="muted"> Last: ${r.last.toLocaleDateString()}</span>
+              </div>
+              <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
+              <div class="actions"><button class="btn" style="background:transparent;color:var(--text)">Send to Zapier</button><button class="btn">+ Add to Buyers List</button></div>`;
+            // hover a card -> show popup + center map
+            row.addEventListener('mouseenter', ()=>{
+              const m = markerById.get(r.id); if(!m) return;
+              m.marker.togglePopup(); map.easeTo({ center:m.coords, duration:600, zoom:Math.max(map.getZoom(),11) });
+            });
+            row.addEventListener('mouseleave', ()=>{
+              const m = markerById.get(r.id); if(!m) return; m.marker.togglePopup();
+            });
+            list.appendChild(row);
+          });
+        }
+      }else if(mode==='homefull'){
+        list.innerHTML=`
+          <div class="row"><b>Homefull</b><div class="muted">AI-OCR on active & sold listings; agent leaderboard.</div></div>
+          <div class="row">
+            <div class="top"><div>506 Washington Blvd</div><span class="badge">Flip-Like 0.81</span></div>
+            <div class="muted">Staged • LVP • Subway tile • Matte black</div>
+            <div class="muted" style="margin-top:6px;">Agent: Leslie Elrod (432) 517-0038</div>
+            <div class="actions"><button class="btn" style="background:transparent;color:var(--text)">Call Agent</button><button class="btn">Skiptrace Owner</button></div>
+          </div>`;
+      }else{
+        list.innerHTML=`
+          <div class="row"><b>Wholesaler Sniping</b><div class="muted">Grantor → Grantee repeat pairs (last ${months} mo).</div></div>
+          <div class="row">
+            <div class="top"><div>ABC Investments LLC → Evergreen Homes LLC</div><span class="badge">6 in 12 mo</span></div>
+            <div class="muted">last_deal: 2025-06-11</div>
+            <div class="actions"><button class="btn" style="background:transparent;color:var(--text)">Skiptrace Buyer</button><button class="btn">+ Add to Buyers List</button></div>
+          </div>`;
+      }
+
+      // markers + radius
+      buildMarkers(res);
+      const radiusSrc=map.getSource('radius'); if(radiusSrc) radiusSrc.setData(circlePolygon(center.lon,center.lat,miles));
+      if(fly) map.flyTo({center:[center.lon,center.lat], zoom:Math.max(map.getZoom(),11), essential:true});
+    }
+
+    /* initial */
+    setActive();
   </script>
 </body>
 </html>
