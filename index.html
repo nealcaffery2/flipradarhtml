@@ -1,81 +1,59 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Investorbase — Simple</title>
-
-  <!-- Mapbox GL CSS -->
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet"/>
 
   <style>
-    :root {
-      --blue: #0f6fb2;
-      --accent: #ef4444;
-      --card: #ffffff;
-      --line: #e5e7eb;
-      --text: #111827;
-      --muted: #6b7280;
+    :root{
+      --blue:#0f6fb2; --accent:#ef4444; --card:#ffffff; --line:#e5e7eb; --text:#111827; --muted:#6b7280;
     }
-    * { box-sizing: border-box; }
-    body, html { margin: 0; height: 100%; color: var(--text); font: 14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
-    .app { height: 100%; display: grid; grid-template-columns: 1fr 420px; }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;color:var(--text);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
 
-    /* Top bar */
-    .topbar {
-      position: fixed; left:0; right:0; top:0; height:48px; z-index: 30;
-      background: var(--blue); color:#fff; display:flex; align-items:center; gap:12px; padding:0 14px;
-      box-shadow:0 1px 4px rgba(0,0,0,.25);
-    }
-    .topbar .brand { font-weight:700; }
-    .tabs button { color:#fff; background: transparent; border: 0; padding:6px 10px; border-radius:8px; cursor:pointer; }
-    .tabs button.active { background:#fff; color:#000; }
+    .topbar{position:fixed;inset:0 0 auto 0;height:48px;z-index:30;background:var(--blue);color:#fff;display:flex;align-items:center;gap:12px;padding:0 14px;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+    .brand{font-weight:700}
+    .tabs{display:flex;gap:6px}
+    .tabs button{color:#fff;background:transparent;border:0;padding:6px 10px;border-radius:8px;cursor:pointer}
+    .tabs button.active{background:#fff;color:#000}
 
-    /* Search row */
-    .search-row {
-      position: fixed; left:50%; transform:translateX(-50%);
-      top: 64px; z-index: 20; width: min(1040px,95vw);
-      display: grid; grid-template-columns: 1fr 340px; gap:12px;
-    }
-    @media (max-width: 900px) {
-      .search-row { grid-template-columns: 1fr; }
-    }
+    .search-wrap{position:fixed;z-index:20;left:50%;transform:translateX(-50%);top:64px;width:min(1040px,95vw)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.05),0 10px 25px rgba(0,0,0,.06);padding:10px}
+    .row-flex{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .grow{flex:1 1 320px}
 
-    .card {
-      background: var(--card); border:1px solid var(--line);
-      border-radius:16px; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 10px 25px rgba(0,0,0,.06);
-      padding:10px;
-    }
-    .input {
-      width:100%; border:0; outline:0; background:transparent; padding:10px 12px; font-size:14px;
-      border-radius:10px;
-    }
-    .btn {
-      display:inline-flex; align-items:center; justify-content:center; gap:6px;
-      padding:8px 12px; border-radius:12px; border:1px solid var(--line); background:#000; color:#fff; cursor:pointer;
-    }
-    .btn.secondary { background:#fff; color:#000; }
-    .btn.small { padding:6px 10px; font-size:12px; }
+    .input{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;font-size:14px;outline:0}
+    .sel{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 10px}
+    .label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:#000;color:#fff;cursor:pointer;white-space:nowrap}
 
-    .autocomplete { position:absolute; left:0; right:0; top:100%; margin-top:8px; max-height:280px; overflow:auto; }
-    .autocomplete button { display:block; width:100%; text-align:left; padding:10px 12px; border:0; background:#fff; cursor:pointer; }
-    .autocomplete button:hover { background:#f3f4f6; }
+    .ac{position:absolute;left:10px;right:10px;top:calc(100% + 8px);max-height:280px;overflow:auto;border-radius:12px;display:none}
+    .ac button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:#fff;cursor:pointer;border-bottom:1px solid var(--line)}
+    .ac button:last-child{border-bottom:0}
+    .ac button:hover{background:#f3f4f6}
 
-    /* Map + Sidebar */
-    #map { width: 100%; height: 100%; }
-    .sidebar { border-left:1px solid var(--line); background:#fff; height:100vh; overflow:auto; padding-top: 48px; }
-    .chips { display:flex; gap:6px; align-items:center; padding:10px; border-bottom:1px solid var(--line); }
-    .chip { font-size:12px; border:1px solid var(--line); background:#fff; padding:4px 8px; border-radius:999px; }
-    .tile-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; padding:10px; border-bottom:1px solid var(--line); }
-    .tile { padding:10px; }
-    .muted { color: var(--muted); }
-    .row { padding:12px; border-bottom:1px solid var(--line); }
-    .row .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-weight:600; }
-    .badge { font-size:11px; border:1px solid var(--line); padding:4px 8px; border-radius:999px; }
-    .badge.blue { background:#3b82f6; color:#fff; border-color:#3b82f6; }
-    .badge.green { background:#22c55e; color:#fff; border-color:#22c55e; }
-    .badge.red { background:#ef4444; color:#fff; border-color:#ef4444; }
-    .actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+    .app{height:100%;display:grid;grid-template-columns:1fr 420px;padding-top:48px}
+    @media (max-width: 980px){ .app{grid-template-columns: 1fr} }
+
+    #map{width:100%;height:100%}
+    .sidebar{border-left:1px solid var(--line);background:#fff;height:100vh;overflow:auto}
+    @media (max-width: 980px){ .sidebar{height:auto} }
+
+    .chips{display:flex;gap:6px;align-items:center;padding:10px;border-bottom:1px solid var(--line)}
+    .chip{font-size:12px;border:1px solid var(--line);background:#fff;padding:4px 8px;border-radius:999px}
+    .tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px;border-bottom:1px solid var(--line)}
+    @media (max-width: 420px){ .tile-grid{grid-template-columns:1fr} }
+    .tile{padding:10px}
+    .muted{color:var(--muted)}
+    .row{padding:12px;border-bottom:1px solid var(--line)}
+    .row .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-weight:600}
+    .badge{font-size:11px;border:1px solid var(--line);padding:4px 8px;border-radius:999px}
+    .badge.blue{background:#3b82f6;color:#fff;border-color:#3b82f6}
+    .badge.green{background:#22c55e;color:#fff;border-color:#22c55e}
+    .badge.red{background:#ef4444;color:#fff;border-color:#ef4444}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
   </style>
 </head>
 <body>
@@ -88,32 +66,33 @@
     </div>
   </div>
 
-  <div class="search-row">
+  <!-- Combined address + filters -->
+  <div class="search-wrap">
     <div class="card" style="position:relative">
-      <input id="search" class="input" placeholder="Search address" />
-      <button id="searchBtn" class="btn" style="position:absolute; right:10px; top:50%; transform:translateY(-50%);">Search</button>
-      <div id="ac" class="card autocomplete" style="display:none"></div>
-    </div>
-
-    <div class="card">
-      <div style="font-weight:600; margin-bottom:8px;">Search Filters</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <label class="muted">Miles
-          <select id="miles" style="width:100%; padding:8px; border:1px solid var(--line); border-radius:10px; margin-top:6px;">
+      <div class="row-flex">
+        <div class="grow">
+          <input id="search" class="input" placeholder="Search address"/>
+        </div>
+        <label class="label">
+          Miles
+          <select id="miles" class="sel">
             <option>1</option><option selected>2</option><option>3</option><option>5</option><option>10</option><option>15</option>
           </select>
         </label>
-        <label class="muted">Timeline
-          <select id="months" style="width:100%; padding:8px; border:1px solid var(--line); border-radius:10px; margin-top:6px;">
+        <label class="label">
+          Timeline
+          <select id="months" class="sel">
             <option value="12" selected>Last 12 mo</option>
             <option value="24">Last 24 mo</option>
           </select>
         </label>
+        <button id="searchBtn" class="btn">Search</button>
       </div>
+      <div id="ac" class="card ac"></div>
     </div>
   </div>
 
-  <div class="app" style="padding-top:48px;">
+  <div class="app">
     <div id="map"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -126,14 +105,14 @@
       <div class="tile-grid" id="metricTiles">
         <div class="card tile">
           <div style="font-weight:600">🔨 Flippers</div>
-          <div class="muted" style="margin-top:6px; font-size:12px;">avg price</div>
-          <div id="avgFlip" style="font-weight:700; font-size:18px;">$—</div>
+          <div class="muted" style="margin-top:6px;font-size:12px;">avg price</div>
+          <div id="avgFlip" style="font-weight:700;font-size:18px;">$—</div>
           <div class="muted" style="font-size:12px;">activity last <span id="tileMonthsA">12</span> mo</div>
         </div>
         <div class="card tile">
           <div style="font-weight:600">🏠 Landlords</div>
-          <div class="muted" style="margin-top:6px; font-size:12px;">avg price</div>
-          <div id="avgLand" style="font-weight:700; font-size:18px;">$—</div>
+          <div class="muted" style="margin-top:6px;font-size:12px;">avg price</div>
+          <div id="avgLand" style="font-weight:700;font-size:18px;">$—</div>
           <div class="muted" style="font-size:12px;">activity last <span id="tileMonthsB">12</span> mo</div>
         </div>
       </div>
@@ -142,19 +121,17 @@
     </aside>
   </div>
 
-  <!-- Mapbox GL JS -->
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
-
   <script>
     /***** CONFIG *****/
-    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZmE1djgzdTFpYzkyanBzeTRvcWhtZjYifQ.YRXBgtdmwKq61aljOzx8OQ'; // <-- replace
+    const MAPBOX_TOKEN = 'pk.YOUR_MAPBOX_TOKEN_HERE'; // <-- set your pk token
 
-    /***** DEMO DATA (same idea as before) *****/
+    /***** DEMO DATA *****/
     const buyers = [
-      { id:'b1', name:'Evergreen Residential LLC', type:'flipper', contacts:[{phone:'210-555-0187'}]},
-      { id:'b2', name:'Alamo Rentals Group',      type:'landlord', contacts:[{phone:'210-555-0142'}]},
-      { id:'b3', name:'River City Capital',        type:'cash',     contacts:[{phone:'210-555-0199'}]},
-      { id:'b4', name:'Hill Country Flips',        type:'flipper',  contacts:[{email:'offers@hillcountryflips.com'}]},
+      { id:'b1', name:'Evergreen Residential LLC', buyer_type:'flipper', contacts:[{phone:'210-555-0187'}]},
+      { id:'b2', name:'Alamo Rentals Group',      buyer_type:'landlord', contacts:[{phone:'210-555-0142'}]},
+      { id:'b3', name:'River City Capital',       buyer_type:'cash',     contacts:[{phone:'210-555-0199'}]},
+      { id:'b4', name:'Hill Country Flips',       buyer_type:'flipper',  contacts:[{email:'offers@hillcountryflips.com'}]},
     ];
     const properties = [
       { id:'p1', addr1:'112 Blanco Rd', city:'San Antonio', state:'TX', zip:'78212', lat:29.462, lon:-98.501 },
@@ -175,34 +152,34 @@
     ];
 
     /***** HELPERS *****/
-    const INITIAL = { lat:29.4241, lon:-98.4936 };
+    const INITIAL={lat:29.4241, lon:-98.4936};
+    let mode='buyers', center={...INITIAL}, miles=2, months=12;
+
     function monthsAgo(n){ const d=new Date(); d.setMonth(d.getMonth()-n); return d; }
     function distanceMiles(a,b){
-      const R=3958.8, toRad=x=>x*Math.PI/180;
-      const dLat = toRad(b.lat-a.lat), dLon = toRad(b.lon-a.lon);
+      const R=3958.8,toRad=x=>x*Math.PI/180;
+      const dLat=toRad(b.lat-a.lat), dLon=toRad(b.lon-a.lon);
       const lat1=toRad(a.lat), lat2=toRad(b.lat);
-      const h = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+      const h=Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
       return 2*R*Math.asin(Math.sqrt(h));
     }
-    function circlePolygon(lon, lat, radiusMiles, points=64){
+    function circlePolygon(lon,lat,mi,pts=64){
       const coords=[], R=3958.8, toRad=d=>d*Math.PI/180, toDeg=r=>r*180/Math.PI;
-      const latR=toRad(lat), lonR=toRad(lon), ang=radiusMiles/R;
-      for(let i=0;i<=points;i++){
-        const br=(i/points)*2*Math.PI;
+      const latR=toRad(lat), lonR=toRad(lon), ang=mi/R;
+      for(let i=0;i<=pts;i++){
+        const br=(i/pts)*2*Math.PI;
         const lat2=Math.asin(Math.sin(latR)*Math.cos(ang)+Math.cos(latR)*Math.sin(ang)*Math.cos(br));
         const lon2=lonR+Math.atan2(Math.sin(br)*Math.sin(ang)*Math.cos(latR), Math.cos(ang)-Math.sin(latR)*Math.sin(lat2));
         coords.push([toDeg(lon2), toDeg(lat2)]);
       }
-      return { type:'Feature', geometry:{ type:'Polygon', coordinates:[coords] }, properties:{} };
+      return { type:'Feature', geometry:{type:'Polygon',coordinates:[coords]}, properties:{} };
     }
-    function computeResults(center, radius, months){
-      const since = monthsAgo(months);
-      const filtered = events.filter(e=>{
-        const p=properties.find(pp=>pp.id===e.property_id);
-        if(!p) return false;
-        return e.event_type==='purchase' &&
-               new Date(e.event_date) >= since &&
-               distanceMiles(center,{lat:p.lat,lon:p.lon}) <= radius;
+    function computeResults(cen,mi,mo){
+      const since=monthsAgo(mo);
+      const filtered=events.filter(e=>{
+        const p=properties.find(pp=>pp.id===e.property_id); if(!p) return false;
+        return e.event_type==='purchase' && new Date(e.event_date)>=since &&
+               distanceMiles(cen,{lat:p.lat,lon:p.lon})<=mi;
       });
       const by={};
       filtered.forEach(ev=>{
@@ -214,199 +191,179 @@
       const out = Object.values(by).map(v=>{
         const prices=v.deals.map(d=>d.price).sort((a,b)=>a-b);
         const mid=Math.floor(prices.length/2);
-        const median = prices.length%2 ? prices[mid] : (prices[mid-1]+prices[mid])/2;
-        return {
-          id:v.buyer.id, name:v.buyer.name, type:v.buyer.buyer_type,
-          contacts:v.buyer.contacts, deals:v.deals.length, last:v.last, median
-        };
+        const median=prices.length%2?prices[mid]:(prices[mid-1]+prices[mid])/2;
+        return { id:v.buyer.id, name:v.buyer.name, buyer_type:v.buyer.buyer_type, contacts:v.buyer.contacts, deals:v.deals.length, last:v.last, median };
       });
-      out.sort((a,b)=> b.deals - a.deals || b.last - a.last);
+      out.sort((a,b)=> b.deals-a.deals || b.last-b.last);
       return out;
     }
     function smartMatch(r){
-      const days = Math.max(1,(Date.now()-r.last.getTime())/(1000*60*60*24));
-      const rec = Math.max(0,100-Math.min(100, days/3));
-      const freq = Math.min(100, r.deals*15);
-      return Math.round(0.6*rec + 0.4*freq);
+      const days=Math.max(1,(Date.now()-r.last.getTime())/(1000*60*60*24));
+      const rec=Math.max(0,100-Math.min(100,days/3));
+      const freq=Math.min(100,r.deals*15);
+      return Math.round(0.6*rec+0.4*freq);
     }
-
-    /***** STATE *****/
-    let mode='buyers';
-    let center={...INITIAL};
-    let miles=2;
-    let months=12;
 
     /***** MAP *****/
     mapboxgl.accessToken = MAPBOX_TOKEN;
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [INITIAL.lon, INITIAL.lat],
-      zoom: 11
-    });
+    const map=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/streets-v12',center:[INITIAL.lon,INITIAL.lat],zoom:11});
     map.addControl(new mapboxgl.NavigationControl());
 
-    map.on('load', () => {
-      // Sources
-      map.addSource('buyers', { type:'geojson', data:{ type:'FeatureCollection', features:[] }, cluster:true, clusterRadius:40 });
-      map.addSource('radius', { type:'geojson', data: circlePolygon(center.lon, center.lat, miles) });
+    map.on('load', ()=>{
+      map.addSource('buyers',{ type:'geojson', data:{type:'FeatureCollection',features:[]}, cluster:true, clusterRadius:40 });
+      map.addSource('radius',{ type:'geojson', data:circlePolygon(center.lon,center.lat,miles) });
 
-      // Cluster layers
       map.addLayer({ id:'buyers-clusters', type:'circle', source:'buyers', filter:['has','point_count'],
-        paint:{ 'circle-color':'#0ea5e9', 'circle-radius':['step',['get','point_count'],16,10,22,50,28], 'circle-stroke-color':'#fff','circle-stroke-width':1.5 }});
+        paint:{ 'circle-color':'#0ea5e9','circle-radius':['step',['get','point_count'],16,10,22,50,28],'circle-stroke-color':'#fff','circle-stroke-width':1.5 }});
       map.addLayer({ id:'buyers-count', type:'symbol', source:'buyers', filter:['has','point_count'],
         layout:{ 'text-field':'{point_count_abbreviated}','text-size':12 }, paint:{ 'text-color':'#111' }});
 
-      // Single points (symbol with simple circles via circle layer)
       map.addLayer({ id:'buyers-points', type:'circle', source:'buyers', filter:['!',['has','point_count']],
-        paint:{
-          'circle-radius':6, 'circle-stroke-width':1.25, 'circle-stroke-color':'#fff',
-          'circle-color':['match',['get','type'],'flipper','#3b82f6','landlord','#22c55e','#ef4444']
-        }});
+        paint:{ 'circle-radius':6,'circle-stroke-width':1.25,'circle-stroke-color':'#fff',
+                'circle-color':['match',['get','buyer_type'],'flipper','#3b82f6','landlord','#22c55e','#ef4444'] }});
 
-      // Radius ring
-      map.addLayer({ id:'radius-fill', type:'fill', source:'radius',
-        paint:{ 'fill-color': '#ef4444','fill-opacity':0.08 }});
-      map.addLayer({ id:'radius-line', type:'line', source:'radius',
-        paint:{ 'line-color':'#ef4444','line-width':2 }});
+      map.addLayer({ id:'radius-fill', type:'fill', source:'radius', paint:{ 'fill-color':'#ef4444','fill-opacity':0.08 }});
+      map.addLayer({ id:'radius-line', type:'line', source:'radius', paint:{ 'line-color':'#ef4444','line-width':2 }});
 
-      // First draw
-      refreshAll();
+      // Tooltip popup for single points
+      const popup=new mapboxgl.Popup({closeButton:false,closeOnClick:false});
+      map.on('mousemove','buyers-points', e=>{
+        map.getCanvas().style.cursor='pointer';
+        const f=e.features?.[0];
+        if(!f) return;
+        const { name, buyer_type }=f.properties || {};
+        const [x,y]=f.geometry.coordinates;
+        popup.setLngLat([x,y]).setHTML(`<div style="font-weight:600">${name||'Unknown'}</div><div style="font-size:12px;color:#555">${buyer_type||'buyer'}</div>`).addTo(map);
+      });
+      map.on('mouseleave','buyers-points', ()=>{ map.getCanvas().style.cursor=''; popup.remove(); });
+
+      refreshAll(true);
     });
 
-    map.on('click', (e)=> {
-      center = { lat:e.lngLat.lat, lon:e.lngLat.lng };
+    map.on('click', e=>{
+      center={ lat:e.lngLat.lat, lon:e.lngLat.lng };
       refreshAll(true);
     });
 
     function refreshAll(fly){
-      // Update chips
-      document.getElementById('chipMiles').textContent = `${miles} mi`;
-      document.getElementById('chipMonths').textContent = `${months} mo`;
-      document.getElementById('tileMonthsA').textContent = months;
-      document.getElementById('tileMonthsB').textContent = months;
+      // chips
+      document.getElementById('chipMiles').textContent=`${miles} mi`;
+      document.getElementById('chipMonths').textContent=`${months} mo`;
+      document.getElementById('tileMonthsA').textContent=months;
+      document.getElementById('tileMonthsB').textContent=months;
 
-      // Results + metrics
-      const res = computeResults(center, miles, months);
-      const avg = (arr) => Math.round(arr.reduce((a,b)=>a+b,0)/(arr.length||1));
-      const flips = res.filter(r=>r.type==='flipper').map(r=>r.median);
-      const lands = res.filter(r=>r.type==='landlord').map(r=>r.median);
-      document.getElementById('avgFlip').textContent = `$${avg(flips).toLocaleString()}`;
-      document.getElementById('avgLand').textContent = `$${avg(lands).toLocaleString()}`;
+      const res=computeResults(center,miles,months);
 
-      // Fill sidebar list
-      const list = document.getElementById('results');
-      list.innerHTML = '';
-      if (mode === 'buyers') {
-        if (!res.length) {
-          list.innerHTML = `<div class="row muted">No active buyers found. Try increasing the radius or time window.</div>`;
-        } else {
+      // metrics
+      const avg=a=>Math.round((a.reduce((x,y)=>x+y,0))/(a.length||1));
+      const flips=res.filter(r=>r.buyer_type==='flipper').map(r=>r.median);
+      const lands=res.filter(r=>r.buyer_type==='landlord').map(r=>r.median);
+      document.getElementById('avgFlip').textContent=`$${avg(flips).toLocaleString()}`;
+      document.getElementById('avgLand').textContent=`$${avg(lands).toLocaleString()}`;
+
+      // sidebar
+      const list=document.getElementById('results'); list.innerHTML='';
+      if(mode==='buyers'){
+        if(!res.length){
+          list.innerHTML=`<div class="row muted">No active buyers found. Try increasing the radius or time window.</div>`;
+        }else{
           res.forEach(r=>{
-            const colorCls = r.type==='flipper' ? 'blue' : r.type==='landlord' ? 'green' : 'red';
-            const row = document.createElement('div');
-            row.className = 'row';
-            row.innerHTML = `
-              <div class="top">
-                <div>${r.name}</div>
-                <span class="badge ${colorCls}">${r.type}</span>
-              </div>
+            const color = r.buyer_type==='flipper'?'blue':(r.buyer_type==='landlord'?'green':'red');
+            const row=document.createElement('div'); row.className='row';
+            row.innerHTML=`
+              <div class="top"><div>${r.name}</div><span class="badge ${color}">${r.buyer_type}</span></div>
               <div>
                 <span class="badge" style="background:#fde68a;border-color:#fde68a;color:#92400e;">⚡ SmartMatch ${smartMatch(r)}</span>
-                <span class="badge" style="margin-left:6px;background:${r.type==='flipper'?'#3b82f6':'#22c55e'};border-color:${r.type==='flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
+                <span class="badge" style="margin-left:6px;background:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};border-color:${r.buyer_type==='flipper'?'#3b82f6':'#22c55e'};color:#fff;">${r.deals} deals</span>
                 <span class="muted"> Last: ${r.last.toLocaleDateString()}</span>
               </div>
               <div class="muted" style="margin-top:6px;">Median price: $${r.median.toLocaleString()}</div>
-              <div class="actions">
-                <button class="btn secondary small">Send to Zapier</button>
-                <button class="btn small">+ Add to Buyers List</button>
-              </div>`;
+              <div class="actions"><button class="btn" style="background:#fff;color:#000">Send to Zapier</button><button class="btn">+ Add to Buyers List</button></div>`;
             list.appendChild(row);
           });
         }
-      } else if (mode === 'homefull') {
-        list.innerHTML = `
+      }else if(mode==='homefull'){
+        list.innerHTML=`
           <div class="row"><b>Homefull</b><div class="muted">Active & sold listings flagged as rehab/staged; agent leaderboard.</div></div>
           <div class="row">
             <div class="top"><div>506 Washington Blvd</div><span class="badge">Flip-Like 0.81</span></div>
             <div class="muted">Staged • LVP • Subway tile • Matte black</div>
             <div class="muted" style="margin-top:6px;">Agent: Leslie Elrod (432) 517-0038</div>
-            <div class="actions"><button class="btn secondary small">Call Agent</button><button class="btn small">Skiptrace Owner</button></div>
+            <div class="actions"><button class="btn" style="background:#fff;color:#000">Call Agent</button><button class="btn">Skiptrace Owner</button></div>
           </div>`;
-      } else {
-        list.innerHTML = `
-          <div class="row"><b>Wholesaler Sniping</b><div class="muted">Grantor → Grantee pairs with repeat counts (last ${months} mo).</div></div>
+      }else{
+        list.innerHTML=`
+          <div class="row"><b>Wholesaler Sniping</b><div class="muted">Grantor → Grantee repeat pairs (last ${months} mo).</div></div>
           <div class="row">
             <div class="top"><div>ABC Investments LLC → Evergreen Homes LLC</div><span class="badge">6 in 12 mo</span></div>
             <div class="muted">last_deal: 2025-06-11</div>
-            <div class="actions"><button class="btn secondary small">Skiptrace Buyer</button><button class="btn small">+ Add to Buyers List</button></div>
+            <div class="actions"><button class="btn" style="background:#fff;color:#000">Skiptrace Buyer</button><button class="btn">+ Add to Buyers List</button></div>
           </div>`;
       }
 
-      // Map features
+      // map features
       const feats = res.map(r=>{
-        // choose last deal property location
         const last = events.filter(e=>e.buyer_id===r.id).sort((a,b)=>+new Date(b.event_date)-+new Date(a.event_date))[0];
-        const prop = properties.find(p=>p.id===last?.property_id) || { lon:center.lon, lat:center.lat };
-        return { type:'Feature', geometry:{ type:'Point', coordinates:[prop.lon, prop.lat] }, properties:{ type:r.type, id:r.id, name:r.name } };
+        const p = properties.find(pp=>pp.id===last?.property_id) || {lon:center.lon,lat:center.lat};
+        return { type:'Feature', geometry:{type:'Point',coordinates:[p.lon,p.lat]}, properties:{ name:r.name, buyer_type:r.buyer_type, id:r.id } };
       });
-      const buyersSrc = map.getSource('buyers'); if (buyersSrc) buyersSrc.setData({ type:'FeatureCollection', features:feats });
-      const radiusSrc = map.getSource('radius'); if (radiusSrc) radiusSrc.setData(circlePolygon(center.lon, center.lat, miles));
-
-      if (fly) map.flyTo({ center:[center.lon, center.lat], zoom: Math.max(map.getZoom(), 11), essential:true });
+      const buyersSrc=map.getSource('buyers'); if(buyersSrc) buyersSrc.setData({type:'FeatureCollection',features:feats});
+      const radiusSrc=map.getSource('radius'); if(radiusSrc) radiusSrc.setData(circlePolygon(center.lon,center.lat,miles));
+      if(fly) map.flyTo({center:[center.lon,center.lat], zoom:Math.max(map.getZoom(),11), essential:true});
     }
 
-    /***** UI WIRES *****/
-    // Tabs
-    document.getElementById('tab-buyers').onclick = ()=>{ mode='buyers'; setActive(); refreshAll(false); };
-    document.getElementById('tab-homefull').onclick = ()=>{ mode='homefull'; setActive(); refreshAll(false); };
-    document.getElementById('tab-sniping').onclick = ()=>{ mode='sniping'; setActive(); refreshAll(false); };
+    /***** UI *****/
+    // tabs
+    const tBuy=document.getElementById('tab-buyers');
+    const tHome=document.getElementById('tab-homefull');
+    const tSni=document.getElementById('tab-sniping');
     function setActive(){
-      document.getElementById('tab-buyers').classList.toggle('active', mode==='buyers');
-      document.getElementById('tab-homefull').classList.toggle('active', mode==='homefull');
-      document.getElementById('tab-sniping').classList.toggle('active', mode==='sniping');
-      document.getElementById('modeChip').textContent = mode==='buyers' ? 'Buyer Search' : (mode==='homefull' ? 'Homefull' : 'Wholesaler Sniping');
-      // hide metric tiles on non-buyer modes
-      document.getElementById('metricTiles').style.display = (mode==='buyers') ? 'grid' : 'none';
+      tBuy.classList.toggle('active',mode==='buyers');
+      tHome.classList.toggle('active',mode==='homefull');
+      tSni.classList.toggle('active',mode==='sniping');
+      document.getElementById('modeChip').textContent = mode==='buyers'?'Buyer Search':(mode==='homefull'?'Homefull':'Wholesaler Sniping');
+      document.getElementById('metricTiles').style.display = (mode==='buyers')?'grid':'none';
     }
+    tBuy.onclick=()=>{mode='buyers';setActive();refreshAll(false);}
+    tHome.onclick=()=>{mode='homefull';setActive();refreshAll(false);}
+    tSni.onclick=()=>{mode='sniping';setActive();refreshAll(false);}
 
-    // Filters
-    document.getElementById('miles').onchange = (e)=>{ miles = parseFloat(e.target.value); refreshAll(true); };
-    document.getElementById('months').onchange = (e)=>{ months = parseInt(e.target.value, 10); refreshAll(false); };
+    // filters
+    document.getElementById('miles').onchange = e=>{ miles=parseFloat(e.target.value); refreshAll(true); };
+    document.getElementById('months').onchange = e=>{ months=parseInt(e.target.value,10); refreshAll(false); };
 
-    // Search / geocoding
-    const ac = document.getElementById('ac');
-    const search = document.getElementById('search');
-    search.addEventListener('input', handleType);
-    search.addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(search.value); });
+    // search + autocomplete
+    const ac=document.getElementById('ac');
+    const search=document.getElementById('search');
     document.getElementById('searchBtn').onclick = ()=> doSearch(search.value);
+    search.addEventListener('keydown',e=>{ if(e.key==='Enter') doSearch(search.value); });
 
-    let acTimer=null, lastQuery='';
-    function handleType(){
-      const q = search.value.trim();
+    let acTimer=null;
+    search.addEventListener('input', ()=>{
+      const q=search.value.trim();
       if(!q || q.length<3){ ac.style.display='none'; ac.innerHTML=''; return; }
       clearTimeout(acTimer);
-      acTimer=setTimeout(()=> fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true&limit=5&country=us`)
-        .then(r=>r.json())
-        .then(data=>{
-          const feats = data.features||[];
-          if(!feats.length){ ac.style.display='none'; ac.innerHTML=''; return; }
-          ac.innerHTML = feats.map((f,i)=>`<button data-i="${i}">${f.place_name}</button>`).join('');
-          ac.style.display='block';
-          Array.from(ac.querySelectorAll('button')).forEach((b,idx)=>{
-            b.onclick = ()=> doSearch(feats[idx].place_name);
-          });
-        }).catch(()=>{}), 200);
-    }
+      acTimer=setTimeout(()=>{
+        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true&limit=5&country=us`)
+          .then(r=>r.json()).then(d=>{
+            const feats=d.features||[];
+            if(!feats.length){ ac.style.display='none'; ac.innerHTML=''; return; }
+            ac.innerHTML = feats.map((f,i)=>`<button data-i="${i}">${f.place_name}</button>`).join('');
+            ac.style.display='block';
+            Array.from(ac.querySelectorAll('button')).forEach((b,idx)=>{
+              b.onclick = ()=> doSearch(feats[idx].place_name);
+            });
+          }).catch(()=>{});
+      }, 200);
+    });
+
     function doSearch(q){
-      if(!q) return;
-      fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&limit=1&country=us`)
-        .then(r=>r.json())
-        .then(d=>{
+      const s=q.trim(); if(!s) return;
+      fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(s)}.json?access_token=${MAPBOX_TOKEN}&limit=1&country=us`)
+        .then(r=>r.json()).then(d=>{
           const f=d.features?.[0]; if(!f) return;
-          const [lon,lat]=f.center;
-          center={lat,lon};
-          search.value=f.place_name;
-          ac.style.display='none'; ac.innerHTML='';
+          const [lon,lat]=f.center; center={lat,lon};
+          search.value=f.place_name; ac.style.display='none'; ac.innerHTML='';
           refreshAll(true);
         }).catch(()=>{});
     }
