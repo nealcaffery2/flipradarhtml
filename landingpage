@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flip Radar - AI-Powered Real Estate Intelligence</title>
+    <meta name="description" content="Find end buyers with AI precision. Flip Radar uses advanced AI to instantly connect real estate investors with qualified end buyers and their contact information.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        :root {
+            /* White and red theme */
+            --background: rgb(255, 255, 255);
+            --foreground: rgb(38, 38, 38);
+            --card: rgb(252, 252, 252);
+            --card-foreground: rgb(38, 38, 38);
+            --primary: rgb(220, 38, 38);
+            --primary-foreground: rgb(255, 255, 255);
+            --secondary: rgb(248, 113, 113);
+            --secondary-foreground: rgb(38, 38, 38);
+            --muted: rgb(247, 247, 247);
+            --muted-foreground: rgb(115, 115, 115);
+            --accent: rgb(185, 28, 28);
+            --accent-foreground: rgb(255, 255, 255);
+            --border: rgb(235, 235, 235);
+            --input: rgb(255, 255, 255);
+            --ring: rgba(220, 38, 38, 0.5);
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* Mouse follower background effect */
+        .mouse-follower {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(
+                600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(220, 38, 38, 0.03) 0%,
+                transparent 40%
+            );
+            transition: opacity 0.3s ease;
+        }
+
+        /* Typing animation */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: var(--primary); }
+        }
+
+        .typing-animation {
+            overflow: hidden;
+            border-right: 2px solid var(--primary);
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink 1s step-end infinite;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Pulse glow animation */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(220, 38, 38, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.6), 0 0 30px rgba(220, 38, 38, 0.4); }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        /* Slide-in animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in-up {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        /* Animation delays */
+        .animate-delay-100 { animation-delay: 0.1s; }
+        .animate-delay-200 { animation-delay: 0.2s; }
+        .animate-delay-300 { animation-delay: 0.3s; }
+        .animate-delay-400 { animation-delay: 0.4s; }
+        .animate-delay-500 { animation-delay: 0.5s; }
+
+        /* Custom styles */
+        .bg-primary { background-color: var(--primary); }
+        .text-primary { color: var(--primary); }
+        .text-primary-foreground { color: var(--primary-foreground); }
+        .bg-primary-foreground { background-color: var(--primary-foreground); }
+        .text-muted-foreground { color: var(--muted-foreground); }
+        .bg-muted { background-color: var(--muted); }
+        .border-border { border-color: var(--border); }
+        .bg-card { background-color: var(--card); }
+        .text-card-foreground { color: var(--card-foreground); }
+
+        /* Interactive map styles */
+        .map-container {
+            position: relative;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .map-tooltip {
+            position: absolute;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 14px;
+            white-space: nowrap;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .map-marker:hover + .map-tooltip {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mouse follower background -->
+    <div class="mouse-follower" id="mouseFollower"></div>
+
+    <!-- Header -->
+    <header class="border-b border-border bg-white/95 backdrop-blur sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="h-8 w-8 rounded-lg bg-primary flex items-center justify-center float-animation">
+                            <i data-lucide="target" class="h-5 w-5 text-primary-foreground"></i>
+                        </div>
+                        <span class="text-xl font-bold">Flip Radar</span>
+                    </div>
+                </div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105">Features</a>
+                    <a href="#map" class="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105">Market Map</a>
+                    <a href="#testimonials" class="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105">Reviews</a>
+                    <button class="px-4 py-2 text-sm font-medium border border-border rounded-md hover:scale-105 transition-transform duration-300 bg-transparent">Sign In</button>
+                    <button class="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:scale-105 transition-transform duration-300 pulse-glow">Get Started</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative py-20 lg:py-32 bg-gradient-to-br from-white via-white to-gray-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="mb-6 pulse-glow slide-in-up opacity-0" id="badge">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        <i data-lucide="zap" class="h-3 w-3 mr-1"></i>
+                        AI-Powered Real Estate Intelligence
+                    </span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 slide-in-up opacity-0 animate-delay-100" id="hero-title">
+                    Find End Buyers with <span class="text-primary" id="typing-text">AI Precision</span>
+                </h1>
+                <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto slide-in-up opacity-0 animate-delay-200" id="hero-description">
+                    Flip Radar uses advanced AI to instantly connect real estate investors with qualified end buyers and their contact information. Close deals faster than ever before.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center slide-in-up opacity-0 animate-delay-300" id="hero-buttons">
+                    <button class="px-8 py-3 text-lg font-medium bg-primary text-primary-foreground rounded-md hover:scale-105 transition-all duration-300 pulse-glow">
+                        Start Free Trial
+                        <i data-lucide="arrow-right" class="ml-2 h-5 w-5 inline"></i>
+                    </button>
+                    <button class="px-8 py-3 text-lg font-medium border border-border rounded-md bg-transparent hover:scale-105 transition-all duration-300">
+                        Watch Demo
+                    </button>
+                </div>
+                <p class="text-sm text-muted-foreground mt-4 slide-in-up opacity-0 animate-delay-400" id="hero-note">
+                    No credit card required • 14-day free trial
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Map Section -->
+    <section id="map" class="py-20 bg-muted">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Live Market Intelligence</h2>
+                <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+                    See real-time buyer activity across different markets. Hover over regions to explore opportunities.
+                </p>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <div class="map-container h-96 relative">
+                    <!-- Map markers -->
+                    <div class="map-marker" style="top: 30%; left: 20%;"></div>
+                    <div class="map-tooltip" style="top: 25%; left: 22%;">Los Angeles: 45 Active Buyers</div>
+                    
+                    <div class="map-marker" style="top: 25%; left: 35%;"></div>
+                    <div class="map-tooltip" style="top: 20%; left: 37%;">Phoenix: 32 Active Buyers</div>
+                    
+                    <div class="map-marker" style="top: 40%; left: 50%;"></div>
+                    <div class="map-tooltip" style="top: 35%; left: 52%;">Dallas: 38 Active Buyers</div>
+                    
+                    <div class="map-marker" style="top: 20%; left: 65%;"></div>
+                    <div class="map-tooltip" style="top: 15%; left: 67%;">Chicago: 29 Active Buyers</div>
+                    
+                    <div class="map-marker" style="top: 35%; left: 75%;"></div>
+                    <div class="map-tooltip" style="top: 30%; left: 77%;">Atlanta: 41 Active Buyers</div>
+                    
+                    <div class="map-marker" style="top: 25%; left: 80%;"></div>
+                    <div class="map-tooltip" style="top: 20%; left: 82%;">New York: 67 Active Buyers</div>
+                    
+                    <div class="map-marker" style="top: 50%; left: 70%;"></div>
+                    <div class="map-tooltip" style="top: 45%; left: 72%;">Miami: 52 Active Buyers</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Everything You Need to Close More Deals</h2>
+                <p class="text-xl text-muted-foreground max-w-2xl mx-auto">Our AI-powered platform streamlines your entire disposition process</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
+                    <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center mb-4 group-hover:bg-red-100 transition-colors duration-300 float-animation">
+                        <i data-lucide="search" class="h-6 w-6 text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">AI Buyer Matching</h3>
+                    <p class="text-muted-foreground">Our AI analyzes property details and instantly matches you with qualified end buyers in your market</p>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-delay-100">
+                    <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center mb-4 group-hover:bg-red-100 transition-colors duration-300 float-animation">
+                        <i data-lucide="users" class="h-6 w-6 text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">Contact Intelligence</h3>
+                    <p class="text-muted-foreground">Get verified contact information including phone numbers, emails, and preferred communication methods</p>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-delay-200">
+                    <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center mb-4 group-hover:bg-red-100 transition-colors duration-300 float-animation">
+                        <i data-lucide="bar-chart-3" class="h-6 w-6 text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">Market Analytics</h3>
+                    <p class="text-muted-foreground">Real-time market data and buyer behavior insights to optimize your pricing and timing strategies</p>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-delay-300">
+                    <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center mb-4 group-hover:bg-red-100 transition-colors duration-300 float-animation">
+                        <i data-lucide="check-circle" class="h-6 w-6 text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">Automated Outreach</h3>
+                    <p class="text-muted-foreground">Send personalized messages to multiple buyers simultaneously with our smart automation tools</p>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-delay-400">
+                    <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center mb-4 group-hover:bg-red-100 transition-colors duration-300 float-animation">
+                        <i data-lucide="target" class="h-6 w-6 text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">Deal Tracking</h3>
+                    <p class="text-muted-foreground">Monitor all your deals in one dashboard with real-time updates and progress tracking</p>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-delay-500">
+                    <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center mb-4 group-hover:bg-red-100 transition-colors duration-300 float-animation">
+                        <i data-lucide="zap" class="h-6 w-6 text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">Instant Notifications</h3>
+                    <p class="text-muted-foreground">Get alerted immediately when new qualified buyers enter your market or show interest</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-muted">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Trusted by Real Estate Professionals</h2>
+                <p class="text-xl text-muted-foreground">See what our users are saying about Flip Radar</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 pulse-glow">
+                    <div class="flex items-center mb-4">
+                        <div class="flex space-x-1">
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                        </div>
+                    </div>
+                    <p class="text-card-foreground mb-4">"Flip Radar cut my disposition time from weeks to days. The AI matching is incredibly accurate."</p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center mr-3 float-animation">
+                            <span class="text-sm font-medium text-primary">MJ</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-card-foreground">Mike Johnson</p>
+                            <p class="text-sm text-muted-foreground">Real Estate Investor</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 pulse-glow animate-delay-200">
+                    <div class="flex items-center mb-4">
+                        <div class="flex space-x-1">
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                        </div>
+                    </div>
+                    <p class="text-card-foreground mb-4">"The contact intelligence feature is a game-changer. I'm closing 3x more deals now."</p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center mr-3 float-animation">
+                            <span class="text-sm font-medium text-primary">SC</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-card-foreground">Sarah Chen</p>
+                            <p class="text-sm text-muted-foreground">Wholesaler</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 pulse-glow animate-delay-400">
+                    <div class="flex items-center mb-4">
+                        <div class="flex space-x-1">
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                            <i data-lucide="star" class="h-4 w-4 fill-primary text-primary"></i>
+                        </div>
+                    </div>
+                    <p class="text-card-foreground mb-4">"Finally, a tool that understands the real estate market. ROI was immediate."</p>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center mr-3 float-animation">
+                            <span class="text-sm font-medium text-primary">DR</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-card-foreground">David Rodriguez</p>
+                            <p class="text-sm text-muted-foreground">Real Estate Agent</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-primary relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-20 h-20 border border-primary-foreground rounded-full float-animation"></div>
+            <div class="absolute top-32 right-20 w-16 h-16 border border-primary-foreground rounded-full float-animation animate-delay-300"></div>
+            <div class="absolute bottom-20 left-1/4 w-12 h-12 border border-primary-foreground rounded-full float-animation animate-delay-500"></div>
+        </div>
+
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold text-primary-foreground mb-6">
+                    Ready to Transform Your Real Estate Business?
+                </h2>
+                <p class="text-xl text-primary-foreground/90 mb-8">
+                    Join thousands of real estate professionals who are closing more deals with Flip Radar's AI-powered platform.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="px-8 py-3 text-lg font-medium bg-white text-primary rounded-md hover:scale-105 transition-all duration-300 pulse-glow">
+                        Start Your Free Trial
+                        <i data-lucide="arrow-right" class="ml-2 h-5 w-5 inline"></i>
+                    </button>
+                    <button class="px-8 py-3 text-lg font-medium border border-white/20 text-primary-foreground hover:bg-white/10 bg-transparent rounded-md hover:scale-105 transition-all duration-300">
+                        Schedule Demo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-border py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="h-8 w-8 rounded-lg bg-primary flex items-center justify-center float-animation">
+                            <i data-lucide="target" class="h-5 w-5 text-primary-foreground"></i>
+                        </div>
+                        <span class="text-xl font-bold">Flip Radar</span>
+                    </div>
+                    <p class="text-muted-foreground mb-4 max-w-md">
+                        AI-powered real estate disposition tool helping investors, wholesalers, and agents find qualified end buyers faster.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-4">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors duration-300">Features</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors duration-300">Pricing</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors duration-300">API</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors duration-300">Integrations</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors duration-300">About</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors duration-300">Contact</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors duration-300">Privacy</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors duration-300">Terms</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-border mt-8 pt-8 text-center">
+                <p class="text-muted-foreground">© 2024 Flip Radar. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mouse follower effect
+        const mouseFollower = document.getElementById('mouseFollower');
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            mouseFollower.style.setProperty('--mouse-x', x + '%');
+            mouseFollower.style.setProperty('--mouse-y', y + '%');
+        });
+
+        // Typing animation
+        function typeText(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            const timer = setInterval(() => {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(timer);
+                    // Add blinking cursor
+                    element.innerHTML += '<span class="animate-pulse">|</span>';
+                }
+            }, speed);
+        }
+
+        // Initialize animations on page load
+        window.addEventListener('load', () => {
+            // Trigger slide-in animations
+            const animatedElements = document.querySelectorAll('.slide-in-up');
+            animatedElements.forEach(el => {
+                el.classList.remove('opacity-0');
+            });
+
+            // Start typing animation
+            const typingElement = document.getElementById('typing-text');
+            setTimeout(() => {
+                typeText(typingElement, 'AI Precision', 150);
+            }, 1000);
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Map marker hover effects
+        document.querySelectorAll('.map-marker').forEach(marker => {
+            marker.addEventListener('mouseenter', function() {
+                const tooltip = this.nextElementSibling;
+                if (tooltip && tooltip.classList.contains('map-tooltip')) {
+                    tooltip.style.opacity = '1';
+                }
+            });
+            
+            marker.addEventListener('mouseleave', function() {
+                const tooltip = this.nextElementSibling;
+                if (tooltip && tooltip.classList.contains('map-tooltip')) {
+                    tooltip.style.opacity = '0';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
