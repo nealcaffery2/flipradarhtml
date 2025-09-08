@@ -417,7 +417,7 @@
                 formSubtitle.textContent = 'Sign in to access your real estate insights';
                 submitText.textContent = 'Sign In';
                 toggleText.textContent = "Don't have an account?";
-                toggleBtn.textContent = 'Sign up';
+                toggleBtn.onclick = () => window.location.href = 'signup.html';
                 passwordGroup.style.display = 'flex';
                 forgotPassword.style.display = 'block';
             }
