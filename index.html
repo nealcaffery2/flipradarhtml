@@ -5,242 +5,111 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Flip Radar</title>
 <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet"/>
+
 <style>
   :root{
-    --brand:#b91c1c;
-    --brand-700:#991b1b;
-    --text:#0f172a;
-    --muted:#64748b;
-    --line:#e2e8f0;
-    --card:#ffffff;
-    --chip:#f1f5f9;
-    --navy:#0c1220;
+    --brand:#b91c1c; --brand-700:#991b1b;
+    --text:#0f172a; --muted:#64748b; --line:#e2e8f0;
+    --card:#ffffff; --chip:#f1f5f9; --navy:#0c1220;
   }
-  .dark{
-    --text:#e5e7eb;
-    --muted:#94a3b8;
-    --line:#141d33;
-    --card:#0b0f1a;
-    --chip:#0f172a;
-    background:#0b0f1a;
-    color:var(--text);
-  }
-
+  .dark{ --text:#e5e7eb; --muted:#94a3b8; --line:#141d33;
+         --card:#0b0f1a; --chip:#0f172a; background:#0b0f1a; color:var(--text); }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;color:var(--text);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-  a{color:inherit;text-decoration:none}
-  button{cursor:pointer}
+  html,body{height:100%;margin:0;color:var(--text);font:14px/1.4 system-ui}
+  button{cursor:pointer} a{color:inherit;text-decoration:none}
 
-  /* Top bar */
-  .topbar{
-    position:fixed; inset:0 0 auto 0; height:56px; z-index:50;
-    background:#fff; border-bottom:1px solid var(--line);
-    display:flex; align-items:center; justify-content:space-between; padding:0 14px;
-  }
-  .dark .topbar{ background:var(--navy); color:#fff; border-bottom-color:#141d33; }
-  .top-left{display:flex; align-items:center; gap:12px}
-  .logo{display:flex; align-items:center; gap:8px}
-  .logo svg{height:22px; width:22px}
-  .logo .word{font-weight:800; letter-spacing:.2px; color:var(--brand)}
-  .tabs{display:flex; gap:6px}
-  .tab{
-    background:#fff; border:1px solid var(--line);
-    padding:8px 12px; border-radius:10px; font-weight:600;
-  }
-  .tab:hover{ background:var(--brand); color:#fff; border-color:var(--brand) }
-  .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
-  .dark .tab{ background:var(--navy); color:#cbd5e1; border-color:#1f2a44 }
-  .dark .tab:hover, .dark .tab.active{ background:var(--brand); color:#fff }
-
-  .right-actions{display:flex; align-items:center; gap:8px}
-  .profile{display:flex;align-items:center;gap:8px;position:relative}
-  .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-          background:var(--brand);color:#fff;font-weight:700}
-  .profile-btn{border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:#fff}
-  .dark .profile-btn{background:var(--navy);color:#fff;border-color:#1f2a44}
-  .menu{position:absolute;right:0;top:40px;background:var(--card);border:1px solid var(--line);
-        border-radius:10px;display:none;min-width:180px;z-index:60}
-  .menu .mi{padding:10px 12px;border-bottom:1px solid var(--line)}
-  .menu .mi:last-child{border-bottom:0}
-  .menu .mi:hover{background:#f8fafc}
-  .dark .menu .mi:hover{background:#0f172a}
-
+  .topbar{position:fixed;inset:0 0 auto 0;height:56px;z-index:50;
+          background:#fff;border-bottom:1px solid var(--line);
+          display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+  .dark .topbar{background:var(--navy);color:#fff;border-bottom-color:#141d33}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--brand)}
+  .tabs{display:flex;gap:6px}
+  .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--line);font-weight:600}
+  .tab:hover,.tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .right-actions{display:flex;align-items:center;gap:8px}
   .switch{border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:#fff}
   .dark .switch{background:var(--navy);color:#fff;border-color:#1f2a44}
-
-  /* Search */
-  .search-wrap{ position:fixed; z-index:30; left:50%; transform:translateX(-50%); top:72px; width:min(1100px,95vw) }
-  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:10px }
-  .dark .card{ background:var(--navy); border-color:#1f2a44 }
-  .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
-  .grow{ flex:1 1 360px }
-  .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text);
-          border-radius:10px; padding:10px 12px; font-size:14px; outline:0 }
-  .input::-webkit-autofill{box-shadow:0 0 0px 1000px var(--card) inset !important}
-  .dark .input{ border-color:#1f2a44 }
-  .sel{ border:1px solid var(--line); background:transparent; color:var(--text);
-        border-radius:10px; padding:9px 10px }
-  .dark .sel{ border-color:#1f2a44 }
-  .btn-red{ background:var(--brand); color:#fff; border:1px solid var(--brand); border-radius:12px; padding:10px 14px }
-  .btn-red:hover{ background:var(--brand-700) }
-  .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
-       overflow:auto; border-radius:12px; display:none; z-index:40 }
-  .ac button{ display:block; width:100%; text-align:left; padding:10px 12px; border:0;
-              background:var(--card); color:var(--text); cursor:pointer; border-bottom:1px solid var(--line) }
-  .ac button:last-child{ border-bottom:0 }
-  .ac button:hover{ background:#f3f4f6 }
-  .dark .ac button:hover{ background:#0f172a }
-
-  /* Layout */
-  .app{ height:100%; display:grid; grid-template-columns:1fr 420px; padding-top:56px }
-  #map{ width:100%; height:100% }
-  .sidebar{ border-left:1px solid var(--line); background:var(--card); overflow:auto }
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;
+          display:flex;align-items:center;justify-content:center;font-weight:700}
+  .menu{position:absolute;right:12px;top:48px;background:var(--card);border:1px solid var(--line);
+        border-radius:10px;display:none;min-width:200px;z-index:60}
+  .menu .mi{padding:10px 12px;border-bottom:1px solid var(--line)}
+  .menu .mi:last-child{border-bottom:0}
+  .search-wrap{position:fixed;z-index:30;left:50%;transform:translateX(-50%);top:72px;width:min(1100px,95vw)}
+  .row-flex{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+  .grow{flex:1} .input,.sel{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--line)}
+  .btn-red{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .app{height:100%;display:grid;grid-template-columns:1fr 420px;padding-top:56px}
+  #map{width:100%;height:100%}
+  .sidebar{border-left:1px solid var(--line);background:var(--card);overflow:auto}
+  .chips{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--line)}
+  .row{padding:12px;border-bottom:1px solid var(--line)}
+  .badge{font-size:11px;padding:4px 8px;border-radius:999px}
+  .pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+       font-size:18px;background:#fff;border:1px solid #fff;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .temp-wrap{display:flex;align-items:center;gap:8px;margin-top:6px}
+  .temp-track{flex:1;height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+  .temp-fill{height:100%;width:0;background:linear-gradient(90deg,#60a5fa,#f59e0b,#ef4444)}
 </style>
 </head>
 <body>
-
-<!-- TOP BAR -->
 <div class="topbar">
-  <div class="top-left">
-    <a href="#" class="logo">
-      <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9" stroke="var(--brand)" stroke-width="2"/>
-        <path d="M12 12 L19 7" stroke="var(--brand)" stroke-width="2"/>
-        <circle cx="19" cy="7" r="2" fill="var(--brand)"/>
-      </svg>
-      <span class="word">Flip Radar</span>
-    </a>
-    <div class="tabs">
-      <button id="tab-buyers" class="tab active">Buyer Search</button>
-      <button id="tab-list" class="tab">Buyers List</button>
-    </div>
+  <div class="logo"><svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="9" stroke="var(--brand)" stroke-width="2"/></svg>Flip Radar</div>
+  <div class="tabs">
+    <button id="tab-buyers" class="tab active">Buyer Search</button>
+    <button id="tab-homefull" class="tab">Homefull</button>
+    <button id="tab-sniping" class="tab">Sniping</button>
+    <a href="buyers.html" class="tab">Buyers List</a>
   </div>
   <div class="right-actions">
-    <div class="profile">
-      <div id="avatar" class="avatar">FR</div>
-      <button id="profileBtn" class="profile-btn">☰</button>
-      <div id="profileMenu" class="menu">
-        <div class="mi" id="miLogin">Login</div>
-        <div class="mi" id="miLogout">Logout</div>
-      </div>
+    <div class="avatar" id="avatar">FR</div>
+    <button id="profileBtn" class="switch">☰</button>
+    <div id="profileMenu" class="menu">
+      <div class="mi" id="miLogin">Login</div>
+      <div class="mi" id="miLogout">Logout</div>
+      <div class="mi" id="miSettings">Settings</div>
     </div>
     <button id="darkToggle" class="switch">🌙</button>
   </div>
 </div>
 
-<!-- SEARCH -->
 <div class="search-wrap">
-  <div class="card" style="position:relative">
-    <div class="row-flex">
-      <div class="grow">
-        <input id="search" class="input" placeholder="Search address" autocomplete="off"/>
-      </div>
-      <label class="label">
-        Miles
-        <select id="miles" class="sel">
-          <option>1</option><option selected>2</option><option>3</option><option>5</option>
-        </select>
-      </label>
-      <label class="label">
-        Timeline
-        <select id="months" class="sel">
-          <option value="12" selected>Last 12 mo</option>
-          <option value="24">Last 24 mo</option>
-        </select>
-      </label>
-      <button id="searchBtn" class="btn-red">Search</button>
-    </div>
-    <div id="ac" class="card ac"></div>
+  <div class="row-flex">
+    <div class="grow"><input id="search" class="input" placeholder="Search address" autocomplete="off"/></div>
+    <label>Miles <select id="miles" class="sel"><option>1</option><option selected>2</option><option>5</option></select></label>
+    <label>Timeline <select id="months" class="sel"><option value="12" selected>12 mo</option><option value="24">24 mo</option></select></label>
+    <button id="searchBtn" class="btn btn-red">Search</button>
   </div>
 </div>
 
 <div class="app">
   <div id="map"></div>
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar">
+    <div class="chips"><div><span id="chipMiles">2 mi</span> • <span id="chipMonths">12 mo</span></div><div id="resultCount">0</div></div>
     <div id="results"></div>
-    <div id="buyersListView" style="display:none;padding:10px"></div>
   </aside>
 </div>
 
 <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2.43.4/dist/umd/supabase.min.js"></script>
 <script>
-  const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ';
-
-  // STATE
-  let mode = localStorage.getItem('mode') || 'buyers';
-  let center = JSON.parse(localStorage.getItem('center')||'{"lat":29.4241,"lon":-98.4936}');
-  let miles = parseFloat(localStorage.getItem('miles')||2);
-  let months = parseInt(localStorage.getItem('months')||12);
-
-  // Map init
+  const MAPBOX_TOKEN = "YOUR_MAPBOX_KEY";
   mapboxgl.accessToken = MAPBOX_TOKEN;
-  const map = new mapboxgl.Map({
-    container:'map',
-    style: localStorage.getItem('dark')==='1' ? 'mapbox://styles/mapbox/dark-v11':'mapbox://styles/mapbox/light-v11',
-    center:[center.lon,center.lat],
-    zoom:11
-  });
+  const supabase = window.supabase.createClient(
+    "https://gvrpmexbyynaikwiijtz.supabase.co",
+    "YOUR_ANON_KEY"
+  );
 
-  // Dark toggle
-  document.getElementById('darkToggle').onclick = ()=>{
-    const dark = document.body.classList.toggle('dark');
-    localStorage.setItem('dark', dark?'1':'0');
-    map.setStyle(dark?'mapbox://styles/mapbox/dark-v11':'mapbox://styles/mapbox/light-v11');
-    document.getElementById('darkToggle').textContent = dark?'☀️':'🌙';
-  };
+  let mode="buyers", miles=2, months=12;
+  const INITIAL={lat:29.4241, lon:-98.4936};
+  let center={...INITIAL};
+  let map=new mapboxgl.Map({container:"map",style:"mapbox://styles/mapbox/light-v11",center:[center.lon,center.lat],zoom:11});
+  map.addControl(new mapboxgl.NavigationControl());
 
-  // Tabs
-  const tBuy=document.getElementById('tab-buyers');
-  const tList=document.getElementById('tab-list');
-  function setActive(){
-    tBuy.classList.toggle('active',mode==='buyers');
-    tList.classList.toggle('active',mode==='list');
-    document.getElementById('results').style.display = mode==='buyers'?'block':'none';
-    document.getElementById('buyersListView').style.display = mode==='list'?'block':'none';
-    localStorage.setItem('mode',mode);
-  }
-  tBuy.onclick=()=>{mode='buyers';setActive();}
-  tList.onclick=()=>{mode='list';setActive();}
-  setActive();
-
-  // Profile menu
-  const profileBtn = document.getElementById('profileBtn');
-  const profileMenu = document.getElementById('profileMenu');
-  profileBtn.onclick = ()=>{ profileMenu.style.display = profileMenu.style.display==='block'?'none':'block'; }
-  document.addEventListener('click',(e)=>{
-    if(!profileBtn.contains(e.target) && !profileMenu.contains(e.target)){ profileMenu.style.display='none'; }
-  });
-
-  // Autocomplete
-  const ac=document.getElementById('ac');
-  const search=document.getElementById('search');
-  search.value = localStorage.getItem('searchVal')||'';
-  document.getElementById('searchBtn').onclick = ()=> doSearch(search.value);
-  search.addEventListener('input',()=>{
-    const q=search.value.trim();
-    if(!q || q.length<3){ ac.style.display='none'; ac.innerHTML=''; return; }
-    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true&limit=5&country=us`)
-      .then(r=>r.json()).then(d=>{
-        const feats=d.features||[];
-        if(!feats.length){ ac.style.display='none'; return; }
-        ac.innerHTML = feats.map((f,i)=>`<button data-i="${i}">${f.place_name}</button>`).join('');
-        ac.style.display='block';
-        Array.from(ac.querySelectorAll('button')).forEach((b,idx)=> b.onclick=()=>doSearch(feats[idx].place_name));
-      });
-  });
-  function doSearch(q){
-    if(!q) return;
-    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&limit=1&country=us`)
-      .then(r=>r.json()).then(d=>{
-        const f=d.features?.[0]; if(!f) return;
-        const [lon,lat]=f.center; center={lat,lon};
-        map.flyTo({center:[lon,lat],zoom:12});
-        search.value=f.place_name;
-        localStorage.setItem('center',JSON.stringify(center));
-        localStorage.setItem('searchVal',search.value);
-        ac.style.display='none';
-      });
-  }
+  function circlePolygon(lon,lat,mi){/* radius geojson */return {type:"Feature",geometry:{type:"Polygon",coordinates:[[[lon,lat]]]}};}
+  function refreshAll(){document.getElementById("chipMiles").textContent=`${miles} mi`;document.getElementById("chipMonths").textContent=`${months} mo`;document.getElementById("resultCount").textContent="3";document.getElementById("results").innerHTML=`<div class="row"><b>Evergreen Residential LLC</b><div class="temp-wrap"><div class="temp-track"><div class="temp-fill" style="width:85%"></div></div><div>85%</div></div><div class="actions"><button class="btn">Skip Trace</button><button class="btn btn-red">+ Buyers List</button></div></div>`;}
+  refreshAll();
 </script>
 </body>
 </html>
