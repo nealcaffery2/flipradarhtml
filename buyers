@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Flip Radar — Buyers List</title>
+
+<style>
+  :root{
+    --brand:#b91c1c; /* darker red */
+    --text:#0f172a;
+    --muted:#64748b;
+    --line:#e2e8f0;
+    --card:#ffffff;
+    --chip:#f1f5f9;
+    --navy:#0c1220;
+    --btn:#111827;
+  }
+  .dark{
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --line:#1f2a44;
+    --card:#0b0f1a;
+    --chip:#0f172a;
+    --navy:#0c1220;
+    --btn:#e5e7eb;
+    background:#0b0f1a; color:var(--text);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text)}
+
+  /* Top bar */
+  .topbar{
+    position:sticky; top:0; z-index:30; height:56px;
+    background:#fff; color:#000; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; padding:0 14px;
+  }
+  .dark .topbar{ background:var(--navy); color:#fff; border-bottom-color:#1f2a44 }
+  .top-left{display:flex; align-items:center; gap:12px}
+  .logo{display:flex; align-items:center; gap:8px}
+  .logo svg{height:22px; width:22px}
+  .logo .word{font-weight:800; letter-spacing:.2px; color:var(--brand)}
+  .tabs{display:flex; gap:6px}
+  .tab{
+    color:#0f172a; background:#fff; border:1px solid var(--line);
+    padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600; transition:.15s;
+  }
+  .tab:hover{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .dark .tab{ background:var(--navy); color:#cbd5e1; border-color:#1f2a44 }
+  .dark .tab:hover, .dark .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+
+  .right-actions{display:flex; align-items:center; gap:8px}
+  .switch{border:1px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; background:#fff}
+  .dark .switch{ background:var(--navy); color:#fff; border-color:#1f2a44 }
+
+  /* Page wrap */
+  .wrap{max-width:1200px; margin:18px auto; padding:0 14px}
+
+  /* Controls bar */
+  .controls{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:10px; margin-bottom:12px;
+  }
+  .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
+  .input, .sel{
+    border:1px solid var(--line); background:transparent; color:var(--text);
+    border-radius:10px; padding:8px 10px; min-height:36px;
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; padding:9px 14px;
+    border-radius:12px; border:1px solid var(--line); cursor:pointer; white-space:nowrap;
+  }
+  .btn-dark{ background:#111827; color:#fff }
+  .btn-red{ background:var(--brand); color:#fff; border-color:var(--brand) }
+
+  .count{ margin-left:auto; color:var(--muted) }
+
+  /* Table */
+  .table-wrap{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:auto;
+  }
+  table{ width:100%; border-collapse:separate; border-spacing:0 }
+  thead th{
+    position:sticky; top:0; z-index:1; background:var(--chip); color:var(--text);
+    text-align:left; font-weight:700; padding:10px; border-bottom:1px solid var(--line);
+  }
+  tbody td{ padding:10px; border-bottom:1px solid var(--line); vertical-align:top }
+  tbody tr:hover{ background:#f8fafc }
+  .dark tbody tr:hover{ background:#0f172a }
+
+  .badge{ font-size:11px; border:1px solid var(--line); padding:4px 8px; border-radius:999px }
+  .badge.blue{ background:#3b82f6; color:#fff; border-color:#3b82f6 }
+  .badge.green{ background:#22c55e; color:#fff; border-color:#22c55e }
+  .badge.red{ background:#ef4444; color:#fff; border-color:#ef4444 }
+
+  .chip{ font-size:12px; background:#f1f5f9; border:1px solid var(--line); padding:4px 8px; border-radius:999px }
+  .muted{ color:var(--muted) }
+  .note{ width:100%; min-width:200px; border:1px solid var(--line); background:transparent; color:var(--text);
+         border-radius:8px; padding:6px 8px; resize:vertical }
+
+  @media (max-width: 800px){
+    .controls{ gap:8px }
+    .count{ width:100%; margin-left:0; text-align:right }
+    thead{ display:none } /* stacked rows on tiny screens */
+    tbody td{ display:block; border-bottom:0; padding:6px 10px }
+    tbody tr{ border-bottom:1px solid var(--line) }
+    tbody td::before{ content:attr(data-label) ": "; font-weight:700; color:var(--muted) }
+  }
+</style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="top-left">
+      <a href="index.html" class="logo" aria-label="Flip Radar">
+        <!-- red radar SVG -->
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="#b91c1c" stroke-width="2"/>
+          <path d="M12 12 L19 7" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="19" cy="7" r="2" fill="#b91c1c"/>
+        </svg>
+        <span class="word">Flip&nbsp;Radar</span>
+      </a>
+      <div class="tabs">
+        <a class="tab" href="index.html">Buyer Search</a>
+        <button class="tab">Homefull</button>
+        <button class="tab">Wholesaler Sniping</button>
+        <a class="tab active" href="buyers.html">Buyers List</a>
+        <a class="tab" href="settings.html">Settings</a>
+      </div>
+    </div>
+    <div class="right-actions">
+      <button id="darkToggle" class="switch" title="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- Controls -->
+    <div class="controls">
+      <label class="label">
+        Type
+        <select id="fType" class="sel">
+          <option value="">All</option>
+          <option>Flipper</option>
+          <option>Landlord</option>
+          <option>Cash</option>
+        </select>
+      </label>
+      <label class="label">
+        Location contains
+        <input id="fLoc" class="input" placeholder="city, state, zip"/>
+      </label>
+      <label class="label">
+        VIP only
+        <select id="fVip" class="sel">
+          <option value="">No filter</option>
+          <option value="1">VIP only</option>
+          <option value="0">Non-VIP only</option>
+        </select>
+      </label>
+
+      <button id="selectAll" class="btn">Select All</button>
+      <button id="exportCsv" class="btn btn-dark">Export CSV</button>
+      <button id="exportCrm" class="btn btn-red">Export to CRM</button>
+
+      <div id="resultCount" class="count">0 results</div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table id="table">
+        <thead>
+          <tr>
+            <th style="width:36px"><input type="checkbox" id="masterCb"></th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Deals</th>
+            <th>Last</th>
+            <th>Median</th>
+            <th>Contacts</th>
+            <th>VIP</th>
+            <th>Tags</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+/** ---------- Dark mode toggle (shared UX) ---------- */
+(function initTheme(){
+  if(localStorage.getItem('fr_dark')==='1') document.body.classList.add('dark');
+})();
+document.getElementById('darkToggle').onclick = ()=>{
+  document.body.classList.toggle('dark');
+  localStorage.setItem('fr_dark', document.body.classList.contains('dark')?'1':'0');
+};
+
+/** ---------- Storage helpers ---------- */
+const LS_KEY = 'buyersList';           // same key your map page should use
+const WEBHOOK_KEY = 'crmWebhookUrl';   // set in settings.html
+const selected = new Set();
+
+function loadBuyers(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }catch{ return []; }
+}
+function saveBuyers(list){
+  localStorage.setItem(LS_KEY, JSON.stringify(list));
+}
+
+/** ---------- Rendering ---------- */
+const tbody = document.getElementById('tbody');
+const masterCb = document.getElementById('masterCb');
+const resultCount = document.getElementById('resultCount');
+
+function normalizeText(x){ return (x||'').toString().toLowerCase(); }
+
+function getFilters(){
+  return {
+    type: document.getElementById('fType').value,
+    loc:  normalizeText(document.getElementById('fLoc').value),
+    vip:  document.getElementById('fVip').value, // '', '1', '0'
+  };
+}
+
+function applyFilters(list){
+  const f=getFilters();
+  return list.filter(r=>{
+    if(f.type && r.buyer_type !== f.type) return false;
+    const loc = `${r.city||''} ${r.state||''} ${r.zip||''}`.trim();
+    if(f.loc && !normalizeText(loc).includes(f.loc)) return false;
+    if(f.vip==='1' && !r.vip) return false;
+    if(f.vip==='0' && !!r.vip) return false;
+    return true;
+  });
+}
+
+function fmtMoney(n){ return n==null ? '—' : `$${Number(n).toLocaleString()}`; }
+function fmtDate(d){ try { return new Date(d).toLocaleDateString(); } catch { return '—'; } }
+function contactsStr(c){
+  const arr = (c||[]).map(x=> x.phone || x.email).filter(Boolean);
+  return arr.length ? arr.join(', ') : '—';
+}
+
+function render(){
+  const list = loadBuyers();
+  const view = applyFilters(list);
+  selected.clear();
+  tbody.innerHTML = '';
+  masterCb.checked = false;
+  resultCount.textContent = `${view.length} result${view.length===1?'':'s'}`;
+
+  view.forEach((r, idx)=>{
+    const tr = document.createElement('tr');
+
+    // ensure fields exist
+    r.tags = r.tags || '';
+    r.notes = r.notes || '';
+    const loc = [r.city, r.state, r.zip].filter(Boolean).join(', ');
+
+    tr.innerHTML = `
+      <td data-label="Select"><input type="checkbox" data-id="${r.id}"></td>
+      <td data-label="Name" style="font-weight:600">${r.name||'—'}</td>
+      <td data-label="Type"><span class="badge ${r.buyer_type==='Flipper'?'blue':(r.buyer_type==='Landlord'?'green':'red')}">${r.buyer_type||'—'}</span></td>
+      <td data-label="Location">${loc||'—'}</td>
+      <td data-label="Deals">${r.deals_count ?? r.deals ?? '—'}</td>
+      <td data-label="Last">${fmtDate(r.last_deal||r.last)}</td>
+      <td data-label="Median">${fmtMoney(r.median_price||r.median)}</td>
+      <td data-label="Contacts">${contactsStr(r.contacts)}</td>
+      <td data-label="VIP"><input type="checkbox" data-vip="${r.id}" ${r.vip?'checked':''}></td>
+      <td data-label="Tags"><input type="text" class="input" data-tags="${r.id}" value="${r.tags}"></td>
+      <td data-label="Notes"><textarea class="note" data-notes="${r.id}">${r.notes}</textarea></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // row interactions
+  tbody.querySelectorAll('input[type="checkbox"][data-id]').forEach(cb=>{
+    cb.addEventListener('change', (e)=>{
+      const id = e.target.dataset.id;
+      if(e.target.checked) selected.add(id); else selected.delete(id);
+    });
+  });
+
+  // VIP toggles
+  tbody.querySelectorAll('input[type="checkbox"][data-vip]').forEach(cb=>{
+    cb.addEventListener('change', (e)=>{
+      const id = e.target.dataset.vip;
+      const list = loadBuyers();
+      const row = list.find(x=>x.id===id);
+      if(row){ row.vip = e.target.checked; saveBuyers(list); }
+    });
+  });
+
+  // Tags
+  tbody.querySelectorAll('input[data-tags]').forEach(inp=>{
+    inp.addEventListener('change', (e)=>{
+      const id = e.target.dataset.tags;
+      const list = loadBuyers();
+      const row = list.find(x=>x.id===id);
+      if(row){ row.tags = e.target.value; saveBuyers(list); }
+    });
+  });
+
+  // Notes
+  tbody.querySelectorAll('textarea[data-notes]').forEach(ta=>{
+    ta.addEventListener('change', (e)=>{
+      const id = e.target.dataset.notes;
+      const list = loadBuyers();
+      const row = list.find(x=>x.id===id);
+      if(row){ row.notes = e.target.value; saveBuyers(list); }
+    });
+  });
+}
+
+/** ---------- Controls ---------- */
+document.getElementById('fType').onchange = render;
+document.getElementById('fLoc').oninput = ()=>{ clearTimeout(window._locTimer); window._locTimer=setTimeout(render,200); };
+document.getElementById('fVip').onchange = render;
+
+document.getElementById('selectAll').onclick = ()=>{
+  const boxes = tbody.querySelectorAll('input[type="checkbox"][data-id]');
+  const allChecked = [...boxes].every(b=>b.checked);
+  selected.clear();
+  boxes.forEach(b=>{ b.checked = !allChecked; if(!allChecked) selected.add(b.dataset.id); });
+};
+
+document.getElementById('exportCsv').onclick = ()=>{
+  const rows = applyFilters(loadBuyers());
+  const header = ['id','name','buyer_type','city','state','zip','deals_count','last_deal','median_price','contacts','vip','tags','notes'];
+  const lines = [header.join(',')];
+  rows.forEach(r=>{
+    const contacts = (r.contacts||[]).map(x=>x.phone||x.email||'').join('|');
+    const vals = [
+      r.id, r.name, r.buyer_type, r.city||'', r.state||'', r.zip||'',
+      r.deals_count ?? r.deals ?? '', (r.last_deal||r.last)||'', r.median_price||r.median||'',
+      contacts, r.vip?1:0, r.tags||'', (r.notes||'').replace(/\n/g,' ')
+    ].map(v=> `"${String(v??'').replace(/"/g,'""')}"`);
+    lines.push(vals.join(','));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='buyers.csv'; a.click();
+  URL.revokeObjectURL(url);
+};
+
+document.getElementById('exportCrm').onclick = async ()=>{
+  const webhook = localStorage.getItem(WEBHOOK_KEY)||'';
+  if(!webhook){ alert('Set your CRM webhook URL first in Settings.'); return; }
+  const rows = applyFilters(loadBuyers()).filter(r=> selected.size===0 || selected.has(r.id));
+  if(rows.length===0){ alert('No selected rows to export.'); return; }
+
+  try{
+    const resp = await fetch(webhook, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ source:'flip-radar', count: rows.length, buyers: rows })
+    });
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    alert(`Exported ${rows.length} buyer(s) to CRM webhook.`);
+  }catch(err){
+    console.error(err);
+    alert('Failed to send to CRM webhook. Check Settings URL and CORS.');
+  }
+};
+
+masterCb.onchange = ()=>{
+  selected.clear();
+  const check = masterCb.checked;
+  tbody.querySelectorAll('input[type="checkbox"][data-id]').forEach(cb=>{
+    cb.checked = check;
+    if(check) selected.add(cb.dataset.id);
+  });
+};
+
+/** ---------- Boot ---------- */
+render();
+</script>
+</body>
+</html>
