@@ -787,7 +787,7 @@
       btn.disabled = true; btn.textContent='Fetching RA...';
       const agent = await fetchRegisteredAgent(name, stateCode);
       btn.textContent = agent ? `RA: ${agent}` : 'RA not found';
-      setTimeout(()=>{ btn.disabled=false; btn.textContent='Get Registered Agent'; }, 5000);
+      setTimeout(()=>{ btn.disabled=false; btn.textContent='Get Contact Info'; }, 5000);
     }
 
     function refreshAll(fly){
@@ -873,7 +873,7 @@
               <div style="min-width:44px;text-align:right;font-weight:700">${scorePct}%</div>
             </div>
             <div class="actions">
-              <button class="btn" data-ra="1">Get Registered Agent</button>
+              <button class="btn" data-ra="1">Get Contact Info</button>
               <button class="btn btn-red" data-add="1">+ Add to Buyers List</button>
             </div>`;
           // hover a card → show popup + center map
