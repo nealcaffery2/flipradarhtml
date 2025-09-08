@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -9,17 +8,17 @@
 
 <style>
   :root{
-    --brand:#b91c1c;         /* darker red */
-    --brand-600:#dc2626;     /* hover red */
-    --text:#0f172a;          /* slate-900 */
-    --muted:#64748b;         /* slate-500 */
-    --line:#e2e8f0;          /* slate-200 */
+    --brand:#b91c1c;
+    --brand-600:#dc2626;
+    --text:#0f172a;
+    --muted:#64748b;
+    --line:#e2e8f0;
     --card:#ffffff;
-    --chip:#f1f5f9;          /* slate-100 */
-    --btn:#111827;           /* near black */
-    --navy:#0c1220;          /* dark header/search */
-    --meter-bg:#e5e7eb;      /* light meter bg */
-    --meter-bg-dark:#1f2a44; /* dark meter bg */
+    --chip:#f1f5f9;
+    --btn:#111827;
+    --navy:#0c1220;
+    --meter-bg:#e5e7eb;
+    --meter-bg-dark:#1f2a44;
   }
   .dark{
     --text:#e5e7eb;
@@ -38,7 +37,7 @@
 
   /* Top bar */
   .topbar{
-    position:fixed; inset:0 0 auto 0; height:56px; z-index:30;
+    position:fixed; inset:0 0 auto 0; height:56px; z-index:40;
     background:#fff; color:#000; border-bottom:1px solid var(--line);
     display:flex; align-items:center; justify-content:space-between; padding:0 14px;
   }
@@ -58,9 +57,19 @@
   .dark .tab{ background:var(--navy); color:#cbd5e1; border-color:#1f2a44 }
   .dark .tab:hover, .dark .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
 
-  .right-actions{display:flex; align-items:center; gap:8px}
+  .right-actions{display:flex; align-items:center; gap:8px; position:relative}
   .switch{border:1px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; background:#fff}
   .dark .switch{ background:var(--navy); color:#fff; border-color:#1f2a44 }
+  .avatar{width:32px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;background:#ef4444;color:#fff}
+  .hamburger{border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#fff; cursor:pointer}
+  .dark .hamburger{ background:var(--navy); color:#fff; border-color:#1f2a44 }
+
+  .menu{position:absolute; right:0; top:46px; background:var(--card); border:1px solid var(--line);
+        border-radius:12px; overflow:hidden; min-width:180px; display:none; z-index:50}
+  .menu button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:transparent;cursor:pointer}
+  .menu button:hover{background:#f3f4f6}
+  .dark .menu{border-color:#1f2a44}
+  .dark .menu button:hover{background:#0f172a}
 
   /* Combined search */
   .search-wrap{ position:fixed; z-index:20; left:50%; transform:translateX(-50%); top:72px; width:min(1040px,95vw) }
@@ -81,7 +90,7 @@
   .btn-dark{ background:var(--btn); color:#fff }
   .btn-red{ background:var(--brand); color:#fff; border-color:var(--brand) }
   .btn-red:hover{ background:var(--brand-600); border-color:var(--brand-600) }
-  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) } /* red in dark */
+  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) } 
 
   .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
        overflow:auto; border-radius:12px; display:none }
@@ -101,6 +110,12 @@
   @media (max-width: 980px){ .sidebar{ height:auto } }
   .chips{ display:flex; gap:6px; align-items:center; padding:10px; border-bottom:1px solid var(--line) }
   .chip{ font-size:12px; background:var(--chip); border:1px solid var(--line); padding:4px 8px; border-radius:999px }
+
+  /* New: sidebar toolbar (Sort + results count) */
+  .toolbar{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; background:var(--card)}
+  .dark .toolbar{ border-bottom-color:#1f2a44 }
+  .toolbar .count{font-weight:700}
+
   .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:10px; border-bottom:1px solid var(--line) }
   @media (max-width: 420px){ .tile-grid{ grid-template-columns:1fr } }
   .tile{ padding:10px }
@@ -113,23 +128,32 @@
   .badge.red{ background:#ef4444; color:#fff; border-color:#ef4444 }
   .actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px }
 
-  /* Emoji marker styling (colored circular background) */
+  /* Emoji marker styling */
   .pin{
     width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
     font-size:18px;line-height:1;user-select:none;border:1px solid rgba(255,255,255,0.85);
     box-shadow:0 2px 6px rgba(0,0,0,.25); color:#fff;
   }
 
-  /* Buyer Score meter */
+  /* Score meter */
   .score { display:flex; align-items:center; gap:8px; margin:8px 0 4px 0; }
   .score .thermo { font-size:16px; line-height:1; }
   .score .meter { flex:1; height:8px; background:var(--meter-bg); border-radius:999px; overflow:hidden; }
   .dark .score .meter { background:var(--meter-bg-dark); }
   .score .fill { height:100%; width:0%; background:#3b82f6; transition:width .25s ease; border-radius:999px; }
 
-  /* Select-all toolbar */
-  .bulkbar{ position:sticky; top:0; z-index:5; background:var(--card); border-bottom:1px solid var(--line);
+  /* Bulk toolbar */
+  .bulkbar{ position:sticky; top:0; z-index:4; background:var(--card); border-bottom:1px solid var(--line);
             display:flex; align-items:center; justify-content:space-between; padding:10px 12px }
+
+  /* Settings modal */
+  .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:60}
+  .modal.show{display:flex}
+  .modal .shade{position:absolute; inset:0; background:rgba(0,0,0,.4)}
+  .modal .panel{position:relative; background:var(--card); border:1px solid var(--line); border-radius:16px; width:min(720px,95vw); max-height:85vh; overflow:auto; padding:18px}
+  .modal h3{margin:0 0 10px 0}
+  .modal .row-flex{gap:8px}
+  .modal .input{width:100%}
 </style>
 </head>
 <body>
@@ -138,7 +162,6 @@
   <div class="topbar">
     <div class="top-left">
       <a href="#" class="logo" aria-label="Flip Radar">
-        <!-- red radar SVG -->
         <svg viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="9" stroke="#b91c1c" stroke-width="2"/>
           <path d="M12 12 L19 7" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
@@ -152,8 +175,18 @@
         <button id="tab-sniping" class="tab">Wholesaler Sniping</button>
       </div>
     </div>
+
     <div class="right-actions">
       <button id="darkToggle" class="switch" title="Toggle dark mode">🌙</button>
+      <button id="hamburgerBtn" class="hamburger" title="Menu">☰</button>
+      <div id="avatar" class="avatar" title="Profile">FR</div>
+
+      <!-- Profile / Hamburger dropdown -->
+      <div id="profileMenu" class="menu">
+        <button id="loginBtn">Login</button>
+        <button id="settingsBtn">Settings</button>
+        <button id="logoutBtn">Logout</button>
+      </div>
     </div>
   </div>
 
@@ -183,7 +216,7 @@
     </div>
   </div>
 
-  <div class="app">
+  <div class="app" id="appRoot">
     <div id="map"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -191,6 +224,21 @@
         <span class="chip" id="modeChip">Buyer Search</span>
         <span class="chip" id="chipMiles">2 mi</span>
         <span class="chip" id="chipMonths">12 mo</span>
+      </div>
+
+      <!-- NEW: Toolbar with Sort dropdown (blue-circled control) + results count -->
+      <div class="toolbar">
+        <label class="label" style="margin:0">
+          Sort by
+          <select id="sortBy" class="sel">
+            <option value="score">Buyer Score (hot → cold)</option>
+            <option value="distance">Distance (near → far)</option>
+            <option value="contacted">Most Contacted</option>
+            <option value="recent">Most Recent Purchase</option>
+            <option value="deals">Most Deals</option>
+          </select>
+        </label>
+        <div class="count">Results: <span id="resultCount">0</span></div>
       </div>
 
       <div class="tile-grid" id="metricTiles">
@@ -223,10 +271,58 @@
     </aside>
   </div>
 
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="modal" aria-hidden="true">
+    <div class="shade"></div>
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <h3>Settings</h3>
+        <button id="closeSettings" class="btn">✕</button>
+      </div>
+      <div class="muted" style="margin-bottom:12px">Configure your integrations. Values are saved in your browser.</div>
+
+      <div class="row-flex">
+        <label class="label grow">BatchData Webhook (bulk skiptrace)
+          <input id="set-skiptrace" class="input" placeholder="https://your-worker/skiptrace"/>
+        </label>
+      </div>
+      <div class="row-flex">
+        <label class="label grow">Email Webhook (SendGrid)
+          <input id="set-email" class="input" placeholder="https://your-worker/send-email"/>
+        </label>
+      </div>
+      <div class="row-flex">
+        <label class="label grow">SMS Webhook
+          <input id="set-sms" class="input" placeholder="https://your-worker/sms"/>
+        </label>
+      </div>
+      <div class="row-flex">
+        <label class="label grow">RVM Webhook
+          <input id="set-rvm" class="input" placeholder="https://your-worker/rvm"/>
+        </label>
+      </div>
+      <div class="row-flex">
+        <label class="label grow">CRM Webhook (Export to CRM)
+          <input id="set-crm" class="input" placeholder="https://your-worker/crm"/>
+        </label>
+      </div>
+      <div class="row-flex">
+        <label class="label grow">Apollo Proxy URL (optional)
+          <input id="set-apollo" class="input" placeholder="https://your-worker/apollo"/>
+        </label>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="saveSettings" class="btn btn-red">Save Settings</button>
+        <span id="saveNote" class="muted" role="status"></span>
+      </div>
+    </div>
+  </div>
+
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
   <script>
     /* ===================== CONFIG ===================== */
-    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ'; // your pk token
+    const MAPBOX_TOKEN = 'pk.eyJ1IjoiaG9tZXByb3MyMDI1IiwiYSI6ImNtZjlyOWdlejAwa2QycnE3cnNibnNvZjIifQ.gGgpxSOWpu2dTZ2N-o8pEQ';
 
     /* ===================== DEMO DATA ===================== */
     const buyers = [
@@ -254,9 +350,11 @@
     ];
 
     /* ===================== STATE ===================== */
-    const INITIAL={lat:29.4241, lon:-98.4936}; // San Antonio
+    const INITIAL={lat:29.4241, lon:-98.4936};
     let mode='buyers', center={...INITIAL}, miles=2, months=12;
-    const selected = new Set(); // bulk selection
+    let sortMode='score';
+    let isAuthed = JSON.parse(localStorage.getItem('fr_authed') || 'false');
+    const selected = new Set();
 
     /* ===================== HELPERS ===================== */
     function monthsAgo(n){ const d=new Date(); d.setMonth(d.getMonth()-n); return d; }
@@ -279,13 +377,11 @@
       return { type:'Feature', geometry:{type:'Polygon',coordinates:[coords]}, properties:{} };
     }
 
-    // compute deals in last N months for a buyer (portfolio volume regardless of radius)
     function totalDealsLastMonths(buyerId, mo){
       const since=monthsAgo(mo);
       return events.filter(e=>e.buyer_id===buyerId && e.event_type==='purchase' && new Date(e.event_date)>=since).length;
     }
 
-    // Compute results strictly within radius; include: latest in-radius coord, distance, trueCount (in window), portfolio24 (last 24m)
     function computeResults(cen,mi,mo){
       const since=monthsAgo(mo);
       const filtered=events.filter(e=>{
@@ -317,64 +413,46 @@
         const prices=v.deals.map(d=>d.price).sort((a,b)=>a-b);
         const mid=Math.floor(prices.length/2);
         const median=prices.length%2?prices[mid]:(prices[mid-1]+prices[mid])/2;
-        const portfolio24 = totalDealsLastMonths(v.buyer.id, 24); // portfolio volume 24m
+        const portfolio24 = totalDealsLastMonths(v.buyer.id, 24);
         return {
           id:v.buyer.id,
           name:v.buyer.name,
           buyer_type:v.buyer.buyer_type,
           contacts:v.buyer.contacts,
-          deals:v.deals.length,           // true count in timeframe
+          deals:v.deals.length,
           last:v.last,
           median,
           coord:v.lastCoord,
-          dist:v.minDist,                 // miles
+          dist:v.minDist,
           portfolio24
         };
       });
 
-      // sort: most deals, then closest, then most recent
-      out.sort((a,b)=>{
-        if(b.deals!==a.deals) return b.deals-a.deals;
-        if(a.dist!==b.dist) return a.dist-b.dist;
-        return b.last-a.last;
-      });
+      // Base sort (will be refined in refreshAll)
+      out.sort((a,b)=>b.deals-a.deals || a.dist-b.dist || b.last-a.last);
       return out;
     }
 
-    /* ====== Buyer Score (0–100%) with distance + counts + portfolio + recency ====== */
+    // Buyer Score
     function buyerScore(r){
-      // Distance factor: closer = higher. If radius=mi and dist in [0, mi], map to [100..0]
       const prox = Math.max(0, Math.min(100, Math.round((1 - (r.dist / Math.max(0.1, miles))) * 100)));
-
-      // True count factor (deals in current window): 0→100 scaled
-      const activity = Math.max(0, Math.min(100, r.deals * 20)); // 5+ deals caps
-
-      // Portfolio factor (last 24 months across all areas)
-      const portfolio = Math.max(0, Math.min(100, r.portfolio24 * 10)); // 10+ caps
-
-      // Recency factor: days since last deal → lower is better
+      const activity = Math.max(0, Math.min(100, r.deals * 20));
+      const portfolio = Math.max(0, Math.min(100, r.portfolio24 * 10));
       const days = Math.max(1, (Date.now() - r.last.getTime())/(1000*60*60*24));
       const recency = Math.max(0, 100 - Math.min(100, Math.round(days / 3)));
-
-      // Weighted mix
       const score = Math.round(0.25*prox + 0.25*activity + 0.15*portfolio + 0.35*recency);
       return Math.max(0, Math.min(100, score));
     }
     function scoreColor(p){
-      if (p < 40) return '#3b82f6';      // cool (blue)
-      if (p < 70) return '#f59e0b';      // warm (amber)
-      if (p < 90) return '#ef4444cc';    // hot (red-ish)
-      return '#ef4444';                  // hottest red
-    }
-    function scoreEmoji(p){
-      if (p < 40) return '🥶';
-      if (p < 70) return '🌡️';
-      return '🥵';
+      if (p < 40) return '#3b82f6';
+      if (p < 70) return '#f59e0b';
+      if (p < 90) return '#ef4444cc';
+      return '#ef4444';
     }
 
     /* ===================== MAP ===================== */
     mapboxgl.accessToken = MAPBOX_TOKEN;
-    const mapStyleLight = 'mapbox://styles/mapbox/light-v11';   // plainer style
+    const mapStyleLight = 'mapbox://styles/mapbox/light-v11';
     const mapStyleDark  = 'mapbox://styles/mapbox/dark-v11';
 
     let map = new mapboxgl.Map({
@@ -400,7 +478,7 @@
       map.once('style.load',()=>{ addRadiusSources(); refreshAll(false); });
     }
 
-    // DOM markers with colored circular background
+    // DOM markers
     const markerById = new Map();
     function clearMarkers(){
       for(const {marker,popup} of markerById.values()){ popup.remove(); marker.remove(); }
@@ -446,16 +524,15 @@
 
     document.getElementById('darkToggle').onclick = ()=>{
       document.body.classList.toggle('dark');
-      // Search button turns red in both modes; ensure in dark it's red too
       document.getElementById('searchBtn').className = 'btn btn-red';
       switchStyle();
     };
 
-    // make Search button red in light mode too (you asked for this)
     document.getElementById('searchBtn').className = 'btn btn-red';
 
     document.getElementById('miles').onchange = e=>{ miles=parseFloat(e.target.value); refreshAll(true); };
     document.getElementById('months').onchange = e=>{ months=parseInt(e.target.value,10); refreshAll(false); };
+    document.getElementById('sortBy').onchange = e=>{ sortMode=e.target.value; refreshAll(false); };
 
     // search & autocomplete
     const ac=document.getElementById('ac');
@@ -495,6 +572,7 @@
     const resultsDiv = document.getElementById('results');
     const selectAllEl = document.getElementById('selectAll');
     const bulkBtn = document.getElementById('bulkSkip');
+    const resultCountEl = document.getElementById('resultCount');
 
     function updateBulkUI(){
       bulkBtn.disabled = selected.size===0;
@@ -514,7 +592,6 @@
     });
 
     bulkBtn.addEventListener('click', ()=>{
-      // Here you’d kick off your BatchData bulk skiptrace.
       alert(`Bulk skiptrace for ${selected.size} selected buyers:\n\n` + [...selected].join('\n'));
     });
 
@@ -551,14 +628,32 @@
       `;
     }
 
+    function sortResults(res){
+      switch(sortMode){
+        case 'distance':
+          res.sort((a,b)=>a.dist-b.dist || b.deals-a.deals || b.last-a.last); break;
+        case 'recent':
+          res.sort((a,b)=>b.last-a.last || a.dist-b.dist); break;
+        case 'deals':
+          res.sort((a,b)=>b.deals-a.deals || a.dist-b.dist || b.last-a.last); break;
+        case 'contacted':
+          // proxy using portfolio24 as "contact frequency"
+          res.sort((a,b)=>b.portfolio24-a.portfolio24 || b.deals-a.deals || a.dist-b.dist); break;
+        case 'score':
+        default:
+          res.sort((a,b)=>buyerScore(b)-buyerScore(a) || a.dist-b.dist); break;
+      }
+      return res;
+    }
+
     function refreshAll(fly){
-      // chips
       document.getElementById('chipMiles').textContent=`${miles} mi`;
       document.getElementById('chipMonths').textContent=`${months} mo`;
       document.getElementById('tileMonthsA').textContent=months;
       document.getElementById('tileMonthsB').textContent=months;
 
-      const res=computeResults(center,miles,months);
+      let res=computeResults(center,miles,months);
+      res = sortResults(res);
 
       // metrics
       const avg=a=>Math.round((a.reduce((x,y)=>x+y,0))/(a.length||1));
@@ -566,6 +661,9 @@
       const lands=res.filter(r=>r.buyer_type==='Landlord').map(r=>r.median);
       document.getElementById('avgFlip').textContent=`$${(flips.length?avg(flips):0).toLocaleString()}`;
       document.getElementById('avgLand').textContent=`$${(lands.length?avg(lands):0).toLocaleString()}`;
+
+      // results count (top-right of toolbar)
+      resultCountEl.textContent = res.length;
 
       // sidebar list
       selected.clear();
@@ -578,7 +676,6 @@
             const row=document.createElement('div'); row.className='row'; row.dataset.id=r.id;
             row.innerHTML = resultRowHTML(r);
 
-            // hover a card -> show popup + center map
             row.addEventListener('mouseenter', ()=>{
               const m = markerById.get(r.id); if(!m) return;
               m.marker.togglePopup(); map.easeTo({ center:m.coords, duration:600, zoom:Math.max(map.getZoom(),11) });
@@ -586,7 +683,6 @@
             row.addEventListener('mouseleave', ()=>{
               const m = markerById.get(r.id); if(!m) return; m.marker.togglePopup();
             });
-            // checkbox wire
             row.querySelector('input[type="checkbox"]').addEventListener('change', (e)=>{
               const id = e.target.dataset.id;
               if(e.target.checked) selected.add(id); else selected.delete(id);
@@ -617,14 +713,70 @@
 
       updateBulkUI();
 
-      // markers + radius
       buildMarkers(res);
       const radiusSrc=map.getSource('radius'); if(radiusSrc) radiusSrc.setData(circlePolygon(center.lon,center.lat,miles));
       if(fly) map.flyTo({center:[center.lon,center.lat], zoom:Math.max(map.getZoom(),11), essential:true});
     }
 
-    // tab + initial
+    // tabs + initial
     setActive();
+
+    /* ===================== PROFILE / MENU / SETTINGS ===================== */
+    const avatarEl = document.getElementById('avatar');
+    const menuEl = document.getElementById('profileMenu');
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    function toggleMenu(){ menuEl.style.display = (menuEl.style.display==='block')?'none':'block'; }
+    avatarEl.addEventListener('click', toggleMenu);
+    hamburgerBtn.addEventListener('click', toggleMenu);
+    document.addEventListener('click',(e)=>{
+      if(!menuEl.contains(e.target) && !avatarEl.contains(e.target) && !hamburgerBtn.contains(e.target)){
+        menuEl.style.display='none';
+      }
+    });
+
+    const loginBtn=document.getElementById('loginBtn');
+    const logoutBtn=document.getElementById('logoutBtn');
+    function renderAuth(){
+      loginBtn.style.display = isAuthed?'none':'block';
+      logoutBtn.style.display = isAuthed?'block':'none';
+      avatarEl.textContent = isAuthed ? 'FR' : 'GU';
+      localStorage.setItem('fr_authed', JSON.stringify(isAuthed));
+    }
+    loginBtn.onclick=()=>{ isAuthed=true; renderAuth(); menuEl.style.display='none'; };
+    logoutBtn.onclick=()=>{ isAuthed=false; renderAuth(); menuEl.style.display='none'; };
+    renderAuth();
+
+    // Settings modal
+    const settingsBtn=document.getElementById('settingsBtn');
+    const settingsModal=document.getElementById('settingsModal');
+    const closeSettings=document.getElementById('closeSettings');
+    const saveSettings=document.getElementById('saveSettings');
+    const saveNote=document.getElementById('saveNote');
+
+    const fields = {
+      skiptrace: document.getElementById('set-skiptrace'),
+      email: document.getElementById('set-email'),
+      sms: document.getElementById('set-sms'),
+      rvm: document.getElementById('set-rvm'),
+      crm: document.getElementById('set-crm'),
+      apollo: document.getElementById('set-apollo'),
+    };
+    function loadSettings(){
+      const s = JSON.parse(localStorage.getItem('fr_settings') || '{}');
+      Object.keys(fields).forEach(k=> fields[k].value = s[k] || '');
+    }
+    function openSettings(){ loadSettings(); settingsModal.classList.add('show'); }
+    function closeSettingsFn(){ settingsModal.classList.remove('show'); }
+    settingsBtn.onclick=()=>{ openSettings(); menuEl.style.display='none'; };
+    closeSettings.onclick=closeSettingsFn;
+    settingsModal.querySelector('.shade').onclick=closeSettingsFn;
+
+    saveSettings.onclick=()=>{
+      const data = Object.fromEntries(Object.entries(fields).map(([k,el])=>[k, el.value.trim()]));
+      localStorage.setItem('fr_settings', JSON.stringify(data));
+      saveNote.textContent='Saved!';
+      setTimeout(()=> saveNote.textContent='', 1200);
+    };
   </script>
 </body>
 </html>
