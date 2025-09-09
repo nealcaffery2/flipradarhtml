@@ -38,8 +38,8 @@ def handler(request, response):
         # pip: supabase>=2.6.0  (add to your project if you want)
 from supabase import create_client, Client
 
-SUPABASE_URL = os.getenv("https://gvrpmexbyynaikwiijtz.supabase.co","")
-SUPABASE_KEY = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2cnBtZXhieXluYWlrd2lpanR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyNzU4NTIsImV4cCI6MjA3Mjg1MTg1Mn0.Crj9RyWIbhQuzUqlf8FQW1A66jVcxa2p9QtolfRLHFY","")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 sb: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
 
 def save_rows_to_supabase(rows):
