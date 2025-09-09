@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Wholesale Sniping - Flip Radar</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin:0; padding:20px; background:#f8fafc; color:#111; }
+    h1 { margin-bottom:1rem; color:#b91c1c; }
+    .form { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .form input, .form select, .form button {
+      padding:8px 12px; border-radius:6px; border:1px solid #ccc; font-size:14px;
+    }
+    .form button { background:#b91c1c; color:#fff; cursor:pointer; border:none; }
+    .form button:hover { background:#991b1b; }
+    table { width:100%; border-collapse:collapse; margin-top:20px; background:#fff; border-radius:8px; overflow:hidden; }
+    th, td { padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; font-size:14px; }
+    th { background:#f1f5f9; font-weight:600; cursor:pointer; }
+    tr:hover { background:#f9fafb; }
+    .expand { cursor:pointer; color:#b91c1c; font-weight:600; }
+    .docs { background:#f9fafb; }
+    .docs td { font-size:13px; color:#444; }
+    .badge { background:#e5e7eb; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:600; }
+    .link { color:#2563eb; text-decoration:underline; font-size:13px; }
+  </style>
+</head>
+<body>
+
+  <h1>Wholesale Sniping</h1>
+
+  <form class="form" id="searchForm">
+    <input type="text" id="party" placeholder="Enter Wholesaler LLC (Grantor)" required/>
+    <label>From <input type="date" id="from" required/></label>
+    <label>To <input type="date" id="to" required/></label>
+    <button type="submit">Search</button>
+  </form>
+
+  <div id="results"></div>
+
+  <script>
+    const form = document.getElementById('searchForm');
+    const resultsDiv = document.getElementById('results');
+
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const party = document.getElementById('party').value.trim();
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+
+      if(!party || !from || !to){ alert("Fill all fields"); return; }
+
+      resultsDiv.innerHTML = "<p>Loading...</p>";
+      try {
+        const qs = new URLSearchParams({ party, party_type:"grantor", from, to }).toString();
+        const res = await fetch(`/api/bexar?${qs}`);
+        if(!res.ok) throw new Error("API error " + res.status);
+        const data = await res.json();
+        renderTable(data);
+      } catch(err){
+        console.error(err);
+        resultsDiv.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
+      }
+    });
+
+    function groupByGrantorGrantee(rows){
+      const groups = {};
+      rows.forEach(r=>{
+        const key = (r.row_grantor||"") + "→" + (r.row_grantee||"");
+        if(!groups[key]){
+          groups[key] = {
+            grantor: r.row_grantor,
+            grantee: r.row_grantee,
+            docs: []
+          };
+        }
+        groups[key].docs.push(r);
+      });
+      // Convert to array with counts
+      return Object.values(groups).map(g=>({
+        ...g,
+        deal_count: g.docs.length,
+        last_date: g.docs.reduce((a,b)=> (a > b.row_recorded_date ? a : b.row_recorded_date), "")
+      }));
+    }
+
+    function renderTable(rows){
+      if(!rows || !rows.length){
+        resultsDiv.innerHTML = "<p>No results found.</p>";
+        return;
+      }
+      const groups = groupByGrantorGrantee(rows);
+
+      let html = `<table>
+        <thead>
+          <tr>
+            <th>End Buyer (Grantee)</th>
+            <th>Seller (Grantor)</th>
+            <th>Repeat Count</th>
+            <th>Last Deal Date</th>
+            <th>Expand</th>
+          </tr>
+        </thead><tbody>`;
+
+      groups.forEach((g,i)=>{
+        html += `<tr>
+          <td>${g.grantee||""}</td>
+          <td>${g.grantor||""}</td>
+          <td><span class="badge">${g.deal_count}</span></td>
+          <td>${g.last_date}</td>
+          <td class="expand" data-idx="${i}">▶</td>
+        </tr>
+        <tr class="docs" id="docs-${i}" style="display:none"><td colspan="5">
+          <table style="width:100%">
+            <thead>
+              <tr>
+                <th>Doc #</th><th>Date</th><th>Property Address</th><th>Legal Description</th><th>Link</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${g.docs.map(d=>`
+                <tr>
+                  <td>${d.row_doc_number||""}</td>
+                  <td>${d.row_recorded_date||""}</td>
+                  <td>${d.property_address||"[No Address]"}</td>
+                  <td>${d.legal_description||""}</td>
+                  <td><a class="link" target="_blank" href="${d.detail_url}">View</a></td>
+                </tr>`).join("")}
+            </tbody>
+          </table>
+        </td></tr>`;
+      });
+
+      html += `</tbody></table>`;
+      resultsDiv.innerHTML = html;
+
+      // toggle expand
+      document.querySelectorAll(".expand").forEach(el=>{
+        el.addEventListener("click", ()=>{
+          const idx = el.dataset.idx;
+          const row = document.getElementById("docs-"+idx);
+          row.style.display = (row.style.display==="none")?"table-row":"none";
+          el.textContent = row.style.display==="none"?"▶":"▼";
+        });
+      });
+    }
+  </script>
+</body>
+</html>
