@@ -35,3 +35,30 @@ def handler(request, response):
         return response.status(200).headers(headers).send(json.dumps(gj, ensure_ascii=False))
     except Exception as e:
         return response.status(500).json({"error": str(e)})
+        # pip: supabase>=2.6.0  (add to your project if you want)
+from supabase import create_client, Client
+
+SUPABASE_URL = os.getenv("SUPABASE_URL","")
+SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY","")
+sb: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
+
+def save_rows_to_supabase(rows):
+    if not sb or not rows: return
+    payload = []
+    for r in rows:
+        payload.append({
+          "doc_number": r.get("doc_number") or r.get("row_doc_number"),
+          "recorded_date": r.get("recorded_date") or r.get("row_recorded_date"),
+          "grantor": r.get("grantor") or r.get("row_grantor"),
+          "grantee": r.get("grantee") or r.get("row_grantee"),
+          "detail_url": r.get("detail_url"),
+          "property_address": r.get("property_address"),
+          "lng": r.get("lng"), "lat": r.get("lat"),
+          "row_doc_type": r.get("row_doc_type"),
+          "row_grantor": r.get("row_grantor"),
+          "row_grantee": r.get("row_grantee"),
+          "row_recorded_date": r.get("row_recorded_date"),
+        })
+    # upsert on doc_number
+    sb.table("bexar_docs").upsert(payload, on_conflict="doc_number").execute()
+
