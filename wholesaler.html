@@ -51,44 +51,22 @@
 
       resultsDiv.innerHTML = "<p>Loading...</p>";
       try {
-        const qs = new URLSearchParams({ party, party_type:"grantor", from, to }).toString();
+        const qs = new URLSearchParams({ party, party_type:"grantor", from, to, format:"grouped" }).toString();
         const res = await fetch(`/api/bexar?${qs}`);
         if(!res.ok) throw new Error("API error " + res.status);
-        const data = await res.json();
-        renderTable(data);
+        const groups = await res.json();
+        renderTable(groups);
       } catch(err){
         console.error(err);
         resultsDiv.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
       }
     });
 
-    function groupByGrantorGrantee(rows){
-      const groups = {};
-      rows.forEach(r=>{
-        const key = (r.row_grantor||"") + "→" + (r.row_grantee||"");
-        if(!groups[key]){
-          groups[key] = {
-            grantor: r.row_grantor,
-            grantee: r.row_grantee,
-            docs: []
-          };
-        }
-        groups[key].docs.push(r);
-      });
-      // Convert to array with counts
-      return Object.values(groups).map(g=>({
-        ...g,
-        deal_count: g.docs.length,
-        last_date: g.docs.reduce((a,b)=> (a > b.row_recorded_date ? a : b.row_recorded_date), "")
-      }));
-    }
-
-    function renderTable(rows){
-      if(!rows || !rows.length){
+    function renderTable(groups){
+      if(!groups || !groups.length){
         resultsDiv.innerHTML = "<p>No results found.</p>";
         return;
       }
-      const groups = groupByGrantorGrantee(rows);
 
       let html = `<table>
         <thead>
@@ -106,7 +84,7 @@
           <td>${g.grantee||""}</td>
           <td>${g.grantor||""}</td>
           <td><span class="badge">${g.deal_count}</span></td>
-          <td>${g.last_date}</td>
+          <td>${g.last_date||""}</td>
           <td class="expand" data-idx="${i}">▶</td>
         </tr>
         <tr class="docs" id="docs-${i}" style="display:none"><td colspan="5">
@@ -117,7 +95,7 @@
               </tr>
             </thead>
             <tbody>
-              ${g.docs.map(d=>`
+              ${(g.docs||[]).map(d=>`
                 <tr>
                   <td>${d.row_doc_number||""}</td>
                   <td>${d.row_recorded_date||""}</td>
