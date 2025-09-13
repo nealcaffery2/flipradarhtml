@@ -53,9 +53,14 @@
       };
 
       // --- Wire buttons
-      document.getElementById("settingsBtn")?.addEventListener("click", () => {
-        // Point this to your real settings page when ready
-        window.location.href = "/landingpage.html";
+      // Settings button: open in-page modal if available, otherwise redirect
+      document.getElementById("settingsBtn")?.addEventListener("click", (e) => {
+        if (typeof window.openSettings === "function") {
+          e.preventDefault();
+          window.openSettings();
+        } else {
+          window.location.href = "/landingpage.html";
+        }
       });
 
       document.getElementById("logoutBtn")?.addEventListener("click", () => {

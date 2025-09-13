@@ -158,37 +158,7 @@
 </head>
 <body>
 
-  <!-- TOP BAR -->
-  <div class="topbar">
-    <div class="top-left">
-      <a href="#" class="logo" aria-label="Flip Radar">
-        <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="#b91c1c" stroke-width="2"/>
-          <path d="M12 12 L19 7" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="19" cy="7" r="2" fill="#b91c1c"/>
-        </svg>
-        <span class="word">Flip&nbsp;Radar</span>
-      </a>
-     <div class="tabs">
-  <a href="/buyers.html" class="tab">Buyer Search</a>
-  <a href="/wholesaler.html" class="tab">Wholesaler Sniping</a>
-  <a href="/landingpage.html" class="tab">Landing</a>
-</div>
-    </div>
-
-    <div class="right-actions">
-      <button id="darkToggle" class="switch" title="Toggle dark mode">🌙</button>
-      <button id="hamburgerBtn" class="hamburger" title="Menu">☰</button>
-      <div id="avatar" class="avatar" title="Profile">FR</div>
-
-      <!-- Profile / Hamburger dropdown -->
-      <div id="profileMenu" class="menu">
-        <button id="loginBtn">Login</button>
-        <button id="settingsBtn">Settings</button>
-        <button id="logoutBtn">Logout</button>
-      </div>
-    </div>
-  </div>
+  <div id="nav-placeholder"></div>
 
   <!-- SEARCH + FILTERS -->
   <div class="search-wrap">
@@ -353,7 +323,6 @@
     const INITIAL={lat:29.4241, lon:-98.4936};
     let mode='buyers', center={...INITIAL}, miles=2, months=12;
     let sortMode='score';
-    let isAuthed = JSON.parse(localStorage.getItem('fr_authed') || 'false');
     const selected = new Set();
 
     /* ===================== HELPERS ===================== */
@@ -721,33 +690,7 @@
     // tabs + initial
     setActive();
 
-    /* ===================== PROFILE / MENU / SETTINGS ===================== */
-    const avatarEl = document.getElementById('avatar');
-    const menuEl = document.getElementById('profileMenu');
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    function toggleMenu(){ menuEl.style.display = (menuEl.style.display==='block')?'none':'block'; }
-    avatarEl.addEventListener('click', toggleMenu);
-    hamburgerBtn.addEventListener('click', toggleMenu);
-    document.addEventListener('click',(e)=>{
-      if(!menuEl.contains(e.target) && !avatarEl.contains(e.target) && !hamburgerBtn.contains(e.target)){
-        menuEl.style.display='none';
-      }
-    });
-
-    const loginBtn=document.getElementById('loginBtn');
-    const logoutBtn=document.getElementById('logoutBtn');
-    function renderAuth(){
-      loginBtn.style.display = isAuthed?'none':'block';
-      logoutBtn.style.display = isAuthed?'block':'none';
-      avatarEl.textContent = isAuthed ? 'FR' : 'GU';
-      localStorage.setItem('fr_authed', JSON.stringify(isAuthed));
-    }
-    loginBtn.onclick=()=>{ isAuthed=true; renderAuth(); menuEl.style.display='none'; };
-    logoutBtn.onclick=()=>{ isAuthed=false; renderAuth(); menuEl.style.display='none'; };
-    renderAuth();
-
-    // Settings modal
-    const settingsBtn=document.getElementById('settingsBtn');
+    /* ===================== SETTINGS MODAL ===================== */
     const settingsModal=document.getElementById('settingsModal');
     const closeSettings=document.getElementById('closeSettings');
     const saveSettings=document.getElementById('saveSettings');
@@ -767,7 +710,7 @@
     }
     function openSettings(){ loadSettings(); settingsModal.classList.add('show'); }
     function closeSettingsFn(){ settingsModal.classList.remove('show'); }
-    settingsBtn.onclick=()=>{ openSettings(); menuEl.style.display='none'; };
+    window.openSettings = openSettings;
     closeSettings.onclick=closeSettingsFn;
     settingsModal.querySelector('.shade').onclick=closeSettingsFn;
 
@@ -778,5 +721,6 @@
       setTimeout(()=> saveNote.textContent='', 1200);
     };
   </script>
+  <script src="/nav-loader.js"></script>
 </body>
 </html>
