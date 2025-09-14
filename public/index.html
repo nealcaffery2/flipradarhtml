@@ -40,21 +40,24 @@
   .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
          box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 25px rgba(0,0,0,.06); padding:10px }
   .dark .card{ background:var(--navy); border-color:#1f2a44; box-shadow:none }
-  .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+  .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end }
   .grow{ flex:1 1 360px; min-width:260px }
+  .input,.sel,.btn{ height:44px }
   .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text);
-          border-radius:10px; padding:12px 12px; font-size:14px; outline:0 }
+          border-radius:10px; padding:0 12px; font-size:14px; outline:0 }
   .dark .input{ border-color:#1f2a44 }
   .sel{ border:1px solid var(--line); background:transparent; color:var(--text);
-        border-radius:10px; padding:11px 10px }
+        border-radius:10px; padding:0 10px }
   .dark .sel{ border-color:#1f2a44 }
-  .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
-  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:11px 16px;
+  .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:0 16px;
         border-radius:12px; border:1px solid var(--line); cursor:pointer; white-space:nowrap; font-weight:600 }
   .btn-dark{ background:var(--btn); color:#fff }
   .btn-red{ background:var(--brand); color:#fff; border-color:var(--brand) }
   .btn-red:hover{ background:var(--brand-600); border-color:var(--brand-600) }
-  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) } 
+  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) }
+
+  .input::placeholder{ color:var(--muted); opacity:1 }
 
   .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
        overflow:auto; border-radius:12px; display:none }

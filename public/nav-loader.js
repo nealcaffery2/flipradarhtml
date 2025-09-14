@@ -78,16 +78,12 @@
         } catch {}
         // Close menu then go home
         if (menu) menu.style.display = "none";
-        window.location.href = "/index.html";
+        window.location.href = "/landingpage.html";
       });
 
       document.getElementById("loginBtn")?.addEventListener("click", () => {
-        // Fake login toggle; replace with your real auth flow later
-        setAuthed(true);
-        renderAuth();
         if (menu) menu.style.display = "none";
-        // Redirect after login (optional)
-        window.location.href = "/index.html";
+        window.location.href = "/login.html";
       });
 
       renderAuth();
