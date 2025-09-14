@@ -8,16 +8,22 @@
     .then(html => {
       mount.innerHTML = html;
 
-      // --- Active tab highlight
-      const path = window.location.pathname;
+      // --- Active tab highlight (supports ?mode=)
+      const url = new URL(window.location.href);
+      const path = url.pathname === "/" ? "/index.html" : url.pathname;
+      const mode = url.searchParams.get("mode") || "buyers";
       document.querySelectorAll(".tabs a").forEach(a => {
-        a.classList.toggle("active", a.getAttribute("href") === path);
+        const aUrl = new URL(a.getAttribute("href"), window.location.origin);
+        const samePath = (aUrl.pathname === path);
+        const matchMode = !a.dataset.mode || a.dataset.mode === mode;
+        a.classList.toggle("active", samePath && matchMode);
       });
 
       // --- Dark mode toggle (persist to localStorage)
       const DM_KEY = "fr_darkmode";
       const applyDark = (on) => {
         document.body.classList.toggle("dark", !!on);
+        try { window.switchStyle?.(); } catch {}
         try { localStorage.setItem(DM_KEY, on ? "1" : "0"); } catch {}
       };
       applyDark((localStorage.getItem(DM_KEY) || "0") === "1");
