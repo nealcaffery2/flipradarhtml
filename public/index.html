@@ -35,62 +35,29 @@
   html,body{height:100%;margin:0;color:var(--text);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
   a{color:inherit;text-decoration:none}
 
-  /* Top bar */
-  .topbar{
-    position:fixed; inset:0 0 auto 0; height:56px; z-index:40;
-    background:#fff; color:#000; border-bottom:1px solid var(--line);
-    display:flex; align-items:center; justify-content:space-between; padding:0 14px;
-  }
-  .dark .topbar{ background:var(--navy); color:#fff; border-bottom-color:#141d33; }
-  .top-left{display:flex; align-items:center; gap:12px}
-  .logo{display:flex; align-items:center; gap:8px}
-  .logo svg{height:22px; width:22px}
-  .logo .word{font-weight:800; letter-spacing:.2px; color:var(--brand)}
-  .tabs{display:flex; gap:6px}
-  .tab{
-    color:#0f172a; background:#fff; border:1px solid var(--line);
-    padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
-    transition:.15s;
-  }
-  .tab:hover{ background:var(--brand); color:#fff; border-color:var(--brand) }
-  .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
-  .dark .tab{ background:var(--navy); color:#cbd5e1; border-color:#1f2a44 }
-  .dark .tab:hover, .dark .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
-
-  .right-actions{display:flex; align-items:center; gap:8px; position:relative}
-  .switch{border:1px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; background:#fff}
-  .dark .switch{ background:var(--navy); color:#fff; border-color:#1f2a44 }
-  .avatar{width:32px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;background:#ef4444;color:#fff}
-  .hamburger{border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#fff; cursor:pointer}
-  .dark .hamburger{ background:var(--navy); color:#fff; border-color:#1f2a44 }
-
-  .menu{position:absolute; right:0; top:46px; background:var(--card); border:1px solid var(--line);
-        border-radius:12px; overflow:hidden; min-width:180px; display:none; z-index:50}
-  .menu button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:transparent;cursor:pointer}
-  .menu button:hover{background:#f3f4f6}
-  .dark .menu{border-color:#1f2a44}
-  .dark .menu button:hover{background:#0f172a}
-
   /* Combined search */
   .search-wrap{ position:fixed; z-index:20; left:50%; transform:translateX(-50%); top:72px; width:min(1040px,95vw) }
   .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
          box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 25px rgba(0,0,0,.06); padding:10px }
   .dark .card{ background:var(--navy); border-color:#1f2a44; box-shadow:none }
-  .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+  .row-flex{ display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end }
   .grow{ flex:1 1 360px; min-width:260px }
+  .input,.sel,.btn{ height:44px }
   .input{ width:100%; border:1px solid var(--line); background:transparent; color:var(--text);
-          border-radius:10px; padding:12px 12px; font-size:14px; outline:0 }
+          border-radius:10px; padding:0 12px; font-size:14px; outline:0 }
   .dark .input{ border-color:#1f2a44 }
   .sel{ border:1px solid var(--line); background:transparent; color:var(--text);
-        border-radius:10px; padding:11px 10px }
+        border-radius:10px; padding:0 10px }
   .dark .sel{ border-color:#1f2a44 }
-  .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px }
-  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:11px 16px;
+  .label{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:0 16px;
         border-radius:12px; border:1px solid var(--line); cursor:pointer; white-space:nowrap; font-weight:600 }
   .btn-dark{ background:var(--btn); color:#fff }
   .btn-red{ background:var(--brand); color:#fff; border-color:var(--brand) }
   .btn-red:hover{ background:var(--brand-600); border-color:var(--brand-600) }
-  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) } 
+  .dark .btn-dark{ background:var(--brand); border-color:var(--brand) }
+
+  .input::placeholder{ color:var(--muted); opacity:1 }
 
   .ac{ position:absolute; left:10px; right:10px; top:calc(100% + 8px); max-height:280px;
        overflow:auto; border-radius:12px; display:none }
@@ -101,7 +68,7 @@
   .dark .ac button:hover{ background:#0f172a }
 
   /* Layout */
-  .app{ height:100%; display:grid; grid-template-columns:1fr 420px; padding-top:56px }
+  .app{ height:100%; display:grid; grid-template-columns:1fr 420px; }
   @media (max-width: 980px){ .app{ grid-template-columns:1fr } }
   #map{ width:100%; height:100% }
 
@@ -158,37 +125,7 @@
 </head>
 <body>
 
-  <!-- TOP BAR -->
-  <div class="topbar">
-    <div class="top-left">
-      <a href="#" class="logo" aria-label="Flip Radar">
-        <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="#b91c1c" stroke-width="2"/>
-          <path d="M12 12 L19 7" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="19" cy="7" r="2" fill="#b91c1c"/>
-        </svg>
-        <span class="word">Flip&nbsp;Radar</span>
-      </a>
-     <div class="tabs">
-  <a href="/buyers.html" class="tab">Buyer Search</a>
-  <a href="/wholesaler.html" class="tab">Wholesaler Sniping</a>
-  <a href="/landingpage.html" class="tab">Landing</a>
-</div>
-    </div>
-
-    <div class="right-actions">
-      <button id="darkToggle" class="switch" title="Toggle dark mode">🌙</button>
-      <button id="hamburgerBtn" class="hamburger" title="Menu">☰</button>
-      <div id="avatar" class="avatar" title="Profile">FR</div>
-
-      <!-- Profile / Hamburger dropdown -->
-      <div id="profileMenu" class="menu">
-        <button id="loginBtn">Login</button>
-        <button id="settingsBtn">Settings</button>
-        <button id="logoutBtn">Logout</button>
-      </div>
-    </div>
-  </div>
+  <div id="nav-placeholder"></div>
 
   <!-- SEARCH + FILTERS -->
   <div class="search-wrap">
@@ -351,9 +288,9 @@
 
     /* ===================== STATE ===================== */
     const INITIAL={lat:29.4241, lon:-98.4936};
-    let mode='buyers', center={...INITIAL}, miles=2, months=12;
+    const params = new URLSearchParams(window.location.search);
+    let mode=params.get('mode')||'buyers', center={...INITIAL}, miles=2, months=12;
     let sortMode='score';
-    let isAuthed = JSON.parse(localStorage.getItem('fr_authed') || 'false');
     const selected = new Set();
 
     /* ===================== HELPERS ===================== */
@@ -507,26 +444,12 @@
     }
 
     /* ===================== UI WIRING ===================== */
-    const tBuy=document.getElementById('tab-buyers');
-    const tHome=document.getElementById('tab-homefull');
-    const tSni=document.getElementById('tab-sniping');
-    function setActive(){
-      tBuy.classList.toggle('active',mode==='buyers');
-      tHome.classList.toggle('active',mode==='homefull');
-      tSni.classList.toggle('active',mode==='sniping');
+    function updateModeUI(){
       document.getElementById('modeChip').textContent =
-        mode==='buyers'?'Buyer Search':(mode==='homefull'?'Homefull':'Wholesaler Sniping');
+        mode==='buyers'?'Buyer Search':(mode==='homefull'?'Homefull Method':'Wholesale Sniping');
       document.getElementById('metricTiles').style.display = (mode==='buyers')?'grid':'none';
     }
-    tBuy.onclick=()=>{mode='buyers'; setActive(); refreshAll(false);}
-    tHome.onclick=()=>{mode='homefull'; setActive(); refreshAll(false);}
-    tSni.onclick=()=>{mode='sniping'; setActive(); refreshAll(false);}
-
-    document.getElementById('darkToggle').onclick = ()=>{
-      document.body.classList.toggle('dark');
-      document.getElementById('searchBtn').className = 'btn btn-red';
-      switchStyle();
-    };
+    updateModeUI();
 
     document.getElementById('searchBtn').className = 'btn btn-red';
 
@@ -647,6 +570,7 @@
     }
 
     function refreshAll(fly){
+      updateModeUI();
       document.getElementById('chipMiles').textContent=`${miles} mi`;
       document.getElementById('chipMonths').textContent=`${months} mo`;
       document.getElementById('tileMonthsA').textContent=months;
@@ -719,35 +643,8 @@
     }
 
     // tabs + initial
-    setActive();
 
-    /* ===================== PROFILE / MENU / SETTINGS ===================== */
-    const avatarEl = document.getElementById('avatar');
-    const menuEl = document.getElementById('profileMenu');
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    function toggleMenu(){ menuEl.style.display = (menuEl.style.display==='block')?'none':'block'; }
-    avatarEl.addEventListener('click', toggleMenu);
-    hamburgerBtn.addEventListener('click', toggleMenu);
-    document.addEventListener('click',(e)=>{
-      if(!menuEl.contains(e.target) && !avatarEl.contains(e.target) && !hamburgerBtn.contains(e.target)){
-        menuEl.style.display='none';
-      }
-    });
-
-    const loginBtn=document.getElementById('loginBtn');
-    const logoutBtn=document.getElementById('logoutBtn');
-    function renderAuth(){
-      loginBtn.style.display = isAuthed?'none':'block';
-      logoutBtn.style.display = isAuthed?'block':'none';
-      avatarEl.textContent = isAuthed ? 'FR' : 'GU';
-      localStorage.setItem('fr_authed', JSON.stringify(isAuthed));
-    }
-    loginBtn.onclick=()=>{ isAuthed=true; renderAuth(); menuEl.style.display='none'; };
-    logoutBtn.onclick=()=>{ isAuthed=false; renderAuth(); menuEl.style.display='none'; };
-    renderAuth();
-
-    // Settings modal
-    const settingsBtn=document.getElementById('settingsBtn');
+    /* ===================== SETTINGS MODAL ===================== */
     const settingsModal=document.getElementById('settingsModal');
     const closeSettings=document.getElementById('closeSettings');
     const saveSettings=document.getElementById('saveSettings');
@@ -767,7 +664,7 @@
     }
     function openSettings(){ loadSettings(); settingsModal.classList.add('show'); }
     function closeSettingsFn(){ settingsModal.classList.remove('show'); }
-    settingsBtn.onclick=()=>{ openSettings(); menuEl.style.display='none'; };
+    window.openSettings = openSettings;
     closeSettings.onclick=closeSettingsFn;
     settingsModal.querySelector('.shade').onclick=closeSettingsFn;
 
@@ -778,5 +675,6 @@
       setTimeout(()=> saveNote.textContent='', 1200);
     };
   </script>
+  <script src="/nav-loader.js"></script>
 </body>
 </html>

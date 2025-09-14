@@ -1,4 +1,58 @@
 <!-- public/nav.html -->
+<style>
+  :root{
+    --brand:#b91c1c;
+    --brand-600:#dc2626;
+    --text:#0f172a;
+    --muted:#64748b;
+    --line:#e2e8f0;
+    --card:#ffffff;
+    --navy:#0c1220;
+  }
+  .dark{
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --line:#141d33;
+    --card:#0b0f1a;
+    --chip:#0f172a;
+    --btn:#e5e7eb;
+    background:#0b0f1a;
+    color:var(--text);
+  }
+  body{ padding-top:56px; }
+  .topbar{
+    position:fixed; inset:0 0 auto 0; height:56px; z-index:40;
+    background:#fff; color:#000; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; padding:0 14px;
+  }
+  .dark .topbar{ background:var(--navy); color:#fff; border-bottom-color:#141d33; }
+  .top-left{display:flex; align-items:center; gap:12px}
+  .logo{display:flex; align-items:center; gap:8px}
+  .logo svg{height:22px; width:22px}
+  .logo .word{font-weight:800; letter-spacing:.2px; color:var(--brand)}
+  .tabs{display:flex; gap:6px}
+  .tab{
+    color:#0f172a; background:#fff; border:1px solid var(--line);
+    padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+    transition:.15s;
+  }
+  .tab:hover{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .dark .tab{ background:var(--navy); color:#cbd5e1; border-color:#1f2a44 }
+  .dark .tab:hover, .dark .tab.active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+  .right-actions{display:flex; align-items:center; gap:8px; position:relative}
+  .switch{border:1px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; background:#fff}
+  .dark .switch{ background:var(--navy); color:#fff; border-color:#1f2a44 }
+  .avatar{width:32px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;background:#ef4444;color:#fff}
+  .hamburger{border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#fff; cursor:pointer}
+  .dark .hamburger{ background:var(--navy); color:#fff; border-color:#1f2a44 }
+  .menu{position:absolute; right:0; top:46px; background:var(--card); border:1px solid var(--line);
+        border-radius:12px; overflow:hidden; min-width:180px; display:none; z-index:50}
+  .menu button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:transparent;cursor:pointer;color:var(--text)}
+  .menu button:hover{background:#f3f4f6}
+  .dark .menu{border-color:#1f2a44}
+  .dark .menu button:hover{background:#0f172a}
+</style>
 <div class="topbar">
   <div class="top-left">
     <a href="/" class="logo" aria-label="Flip Radar">
@@ -11,9 +65,10 @@
     </a>
 
     <div class="tabs">
-      <a href="/buyers.html" class="tab">Buyer Search</a>
-      <a href="/wholesaler.html" class="tab">Wholesaler Sniping</a>
-      <a href="/landingpage.html" class="tab">Landing</a>
+      <a href="/index.html?mode=buyers" class="tab" data-mode="buyers">Buyer Search</a>
+      <a href="/index.html?mode=homefull" class="tab" data-mode="homefull">Homefull Method</a>
+      <a href="/wholesaler.html" class="tab">Wholesale Sniping</a>
+      <a href="/buyers.html" class="tab">Buyers List</a>
     </div>
   </div>
 

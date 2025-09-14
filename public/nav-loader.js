@@ -8,16 +8,22 @@
     .then(html => {
       mount.innerHTML = html;
 
-      // --- Active tab highlight
-      const path = window.location.pathname;
+      // --- Active tab highlight (supports ?mode=)
+      const url = new URL(window.location.href);
+      const path = url.pathname === "/" ? "/index.html" : url.pathname;
+      const mode = url.searchParams.get("mode") || "buyers";
       document.querySelectorAll(".tabs a").forEach(a => {
-        a.classList.toggle("active", a.getAttribute("href") === path);
+        const aUrl = new URL(a.getAttribute("href"), window.location.origin);
+        const samePath = (aUrl.pathname === path);
+        const matchMode = !a.dataset.mode || a.dataset.mode === mode;
+        a.classList.toggle("active", samePath && matchMode);
       });
 
       // --- Dark mode toggle (persist to localStorage)
       const DM_KEY = "fr_darkmode";
       const applyDark = (on) => {
         document.body.classList.toggle("dark", !!on);
+        try { window.switchStyle?.(); } catch {}
         try { localStorage.setItem(DM_KEY, on ? "1" : "0"); } catch {}
       };
       applyDark((localStorage.getItem(DM_KEY) || "0") === "1");
@@ -53,9 +59,14 @@
       };
 
       // --- Wire buttons
-      document.getElementById("settingsBtn")?.addEventListener("click", () => {
-        // Point this to your real settings page when ready
-        window.location.href = "/landingpage.html";
+      // Settings button: open in-page modal if available, otherwise redirect
+      document.getElementById("settingsBtn")?.addEventListener("click", (e) => {
+        if (typeof window.openSettings === "function") {
+          e.preventDefault();
+          window.openSettings();
+        } else {
+          window.location.href = "/landingpage.html";
+        }
       });
 
       document.getElementById("logoutBtn")?.addEventListener("click", () => {
@@ -67,16 +78,12 @@
         } catch {}
         // Close menu then go home
         if (menu) menu.style.display = "none";
-        window.location.href = "/index.html";
+        window.location.href = "/landingpage.html";
       });
 
       document.getElementById("loginBtn")?.addEventListener("click", () => {
-        // Fake login toggle; replace with your real auth flow later
-        setAuthed(true);
-        renderAuth();
         if (menu) menu.style.display = "none";
-        // Redirect after login (optional)
-        window.location.href = "/index.html";
+        window.location.href = "/login.html";
       });
 
       renderAuth();
